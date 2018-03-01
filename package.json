@@ -7,7 +7,7 @@
     "test": "echo \"TODO: Unit tests\" && exit 1",
     "start": "webpack-dev-server --inline --progress --port 8080 --host 0.0.0.0",
     "build": "webpack --progress --profile --bail",
-    "lint": "tslint -t stylish"
+    "lint": "tslint --project ./tsconfig.json -t stylish"
   },
   "repository": {
     "type": "git",

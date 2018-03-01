@@ -14,7 +14,7 @@ export class MatrixHomeserverService {
         this.localStorage.setItem("mx.csApiUrl", newUrl);
     }
 
-    public buildCsUrl(action: string, version="r0"): string {
+    public buildCsUrl(action: string, version = "r0"): string {
         let baseUrl = this.csApiUrl;
         if (baseUrl.endsWith("/")) baseUrl = baseUrl.substring(0, baseUrl.length - 1);
         if (action.startsWith("/")) action = action.substring(1);
