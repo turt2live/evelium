@@ -11,6 +11,8 @@ Evelium is currently in alpha/development, therefore it may be missing major fea
 
 # Building
 
+Node 8 and npm 5 are required to build Evelium.
+
 ```
 NODE_ENV=development npm install
 npm run build
@@ -19,6 +21,8 @@ npm run build
 The web app will be published in `./build`
 
 # Development
+
+Node 8 and npm 5 should be used when working on Evelium.
 
 ```
 NODE_ENV=development npm install
