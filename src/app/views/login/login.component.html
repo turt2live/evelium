@@ -1,11 +1,13 @@
 <div class="container">
     <div class="logo">
-        <img src="/img/logo/icon.svg" />
+        <img src="/img/logo/icon.svg" title="Evelium Logo" />
     </div>
     <div class="form">
-        <input type="text" placeholder="email@address.com" />
-        <input type="password" placeholder="password" />
-        <button type="submit">Sign In</button>
+        <form (submit)="login()" name="loginForm" novalidate>
+            <input type="text" placeholder="email@address.com" [(ngModel)]="username" [disabled]="isLoading" required/>
+            <input type="password" placeholder="password" [(ngModel)]="password" [disabled]="isLoading" required/>
+            <button type="submit" title="sign in" [disabled]="isLoading">Sign In</button>
+        </form>
         <div class="links">
             <a>forgot your password?</a>
             <a>need an account?</a>

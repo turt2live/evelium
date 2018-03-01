@@ -1,6 +1,5 @@
 import { ApplicationRef, Injector, NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
-import { HttpModule } from "@angular/http";
 import { AppComponent } from "./app.component";
 import { FormsModule } from "@angular/forms";
 import { routing } from "./app.routing";
@@ -16,11 +15,14 @@ import { LandingComponent } from "./views/landing/landing.component";
 import { SpinnerComponent } from "./elements/spinner/spinner.component";
 import { LoggedInComponent } from "./views/logged-in/logged-in.component";
 import { LoginComponent } from "./views/login/login.component";
+import { MatrixAuthService } from "./services/matrix/auth.service";
+import { MatrixHomeserverService } from "./services/matrix/homeserver.service";
+import { HttpClientModule } from "@angular/common/http";
 
 @NgModule({
     imports: [
         BrowserModule,
-        HttpModule,
+        HttpClientModule,
         FormsModule,
         routing,
         NgbModule.forRoot(),
@@ -41,6 +43,9 @@ import { LoginComponent } from "./views/login/login.component";
     ],
     providers: [
         {provide: Window, useValue: window},
+        {provide: Storage, useValue: localStorage},
+        MatrixAuthService,
+        MatrixHomeserverService,
 
         // Vendor
     ],
