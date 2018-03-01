@@ -1,0 +1,40 @@
+// styles in src/style directory are applied to the whole page
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:100|Roboto:300');
+@import '../../node_modules/angular2-toaster/toaster';
+
+body {
+  background: rgb(238, 238, 238) !important;
+  margin: 0;
+  padding: 0;
+  color: #333;
+  font-family: 'Open Sans', sans-serif !important;
+}
+
+// HACK: Work around dialog not showing up
+// ref: https://github.com/shlomiassaf/angular2-modal/issues/280
+.fade.in {
+  opacity: 1;
+}
+
+.modal.in .modal-dialog {
+  -webkit-transform: translate(0, 0);
+  -o-transform: translate(0, 0);
+  transform: translate(0, 0);
+}
+
+.modal-backdrop.in {
+  opacity: 0.5;
+}
+
+button {
+  cursor: pointer;
+}
+
+.label-block {
+  display: block;
+}
+
+.text-muted {
+  display: block;
+  font-size: 12px;
+}
