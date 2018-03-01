@@ -15,6 +15,7 @@ import { LocatorService } from "./services/locator.service";
 import { LandingComponent } from "./views/landing/landing.component";
 import { SpinnerComponent } from "./elements/spinner/spinner.component";
 import { LoggedInComponent } from "./views/logged-in/logged-in.component";
+import { LoginComponent } from "./views/login/login.component";
 
 @NgModule({
     imports: [
@@ -34,6 +35,7 @@ import { LoggedInComponent } from "./views/logged-in/logged-in.component";
         LandingComponent,
         SpinnerComponent,
         LoggedInComponent,
+        LoginComponent,
 
         // Vendor
     ],

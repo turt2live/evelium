@@ -1,0 +1,16 @@
+@import "../vars";
+
+input, button {
+  border: 1px solid $primary_border_color;
+  display: block;
+  color: $primary_fg_color;
+  background-color: $primary_bg_color;
+  padding: 5px;
+  margin: 0;
+}
+
+button {
+  padding-left: 40px;
+  padding-right: 40px;
+  font-size: 0.9em;
+}

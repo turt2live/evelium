@@ -1,0 +1,45 @@
+@import "../../../style/vars";
+
+:host, .container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+}
+
+.logo img {
+  width: 240px;
+}
+
+.logo {
+  display: inline-block;
+  padding-right: 30px;
+  border-right: 1px solid $secondary_border_color;
+}
+
+.form {
+  display: inline-block;
+  margin-left: 30px;
+  text-align: center;
+
+  input {
+    width: 300px;
+  }
+
+  button {
+    width: 150px;
+  }
+
+  input, button, .links {
+    margin-top: 20px;
+  }
+
+  button {
+    display: inline-block;
+  }
+
+  .links {
+    font-size: 10px;
+    color: $secondary_fg_color;
+  }
+}
