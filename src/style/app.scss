@@ -11,6 +11,11 @@ body {
   font-family: 'Open Sans', sans-serif !important;
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
 // HACK: Work around dialog not showing up
 // ref: https://github.com/shlomiassaf/angular2-modal/issues/280
 .fade.in {

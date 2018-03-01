@@ -1,0 +1,5 @@
+// component styles are encapsulated and only applied to their components
+@import "../../../style/vars";
+
+$spinkit-spinner-color: $primary_fg_color;
+@import "../../../../node_modules/spinkit/scss/spinners/11-folding-cube";
