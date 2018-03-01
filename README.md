@@ -1,4 +1,4 @@
-# evelium
+# Evelium
 
 [![TravisCI badge](https://travis-ci.org/turt2live/evelium.svg?branch=master)](https://travis-ci.org/turt2live/evelium)
 [![#evelium:t2bot.io](https://img.shields.io/badge/matrix-%23evelium:t2bot.io-brightgreen.svg)](https://matrix.to/#/#evelium:t2bot.io)
