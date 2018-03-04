@@ -2,5 +2,10 @@
     <div class="search-section">
         <input type="text" class="search" placeholder="Search..." [(ngModel)]="search" />
     </div>
-    <my-room-list-tag *ngFor="let tag of tags" [name]="tag.name" [rooms]="tag.rooms" [nameFilter]="search"></my-room-list-tag>
+    <my-room-list-tag *ngFor="let tag of tags"
+                      [name]="tag.name"
+                      [rooms]="tag.rooms"
+                      [nameFilter]="search"
+                      [defaultNumShown]="tag.defaultNumShown"
+    ></my-room-list-tag>
 </div>

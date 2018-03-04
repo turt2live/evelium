@@ -5,6 +5,7 @@
   color: $secondary_fg_color;
   margin: 10px;
   clear: both;
+  cursor: pointer;
 
   .title {
     display: inline-block;
@@ -22,5 +23,39 @@
 
   .room {
     display: block;
+  }
+
+  .more-rooms {
+    display: block;
+    text-align: center;
+    color: $tertiary_fg_color;
+    font-size: 0.7em;
+    line-height: 0.5;
+    margin-top: 10px;
+    cursor: pointer;
+
+    span {
+      display: inline-block;
+      position: relative;
+    }
+
+    span:before, span:after {
+      content: "";
+      height: 50%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      border-bottom: 1px dashed $tertiary_border_color;
+    }
+
+    span:before {
+      right: 100%;
+      margin-right: 10px;
+    }
+
+    span:after {
+      left: 100%;
+      margin-left: 10px;
+    }
   }
 }

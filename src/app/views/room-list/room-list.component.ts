@@ -6,6 +6,7 @@ import { Subscription } from "rxjs/Subscription";
 interface TaggedRoomList {
     name: string;
     rooms: MatrixRoom[];
+    defaultNumShown: number;
 }
 
 const ROOMS_TAG_ID = "io.evelium.rooms";
@@ -30,7 +31,7 @@ export class RoomListComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit() {
-        this.addTag(DIRECT_TAG_ID, "Direct chats");
+        this.addTag(DIRECT_TAG_ID, "Direct chats", 10);
         this.addTag(ROOMS_TAG_ID, "Rooms");
 
         this.newRoomSubscription = this.sync.getStream<MatrixRoom>("self.room.join").subscribe(this.onNewRoom.bind(this));
@@ -63,8 +64,8 @@ export class RoomListComponent implements OnInit, OnDestroy {
         if (idx === -1) newTag.rooms.push(event.room);
     }
 
-    private addTag(id: string, name: string): TaggedRoomList {
-        const list: TaggedRoomList = {name: name, rooms: []};
+    private addTag(id: string, name: string, defaultNumShown = 0 /* 0 == all */): TaggedRoomList {
+        const list: TaggedRoomList = {name: name, rooms: [], defaultNumShown: defaultNumShown};
         this.tags.push(list);
         this.tagsById[id] = list;
         return list;

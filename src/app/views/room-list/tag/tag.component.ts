@@ -11,15 +11,31 @@ export class RoomListTagComponent {
     @Input() public rooms: MatrixRoom[];
     @Input() public name: string;
     @Input() public nameFilter: string;
+    @Input() public defaultNumShown: number = -1;
+
+    public fullList: boolean = false;
+    public numHidden: number = 0;
+    public numExtraShown: number = 0;
+    public collapsed: boolean = false;
 
     constructor() {
     }
 
     public filteredRooms(): MatrixRoom[] {
+        let filteredRooms = this.rooms;
         if (this.nameFilter) {
-            return this.rooms.filter(r => r.displayName.toLowerCase().indexOf(this.nameFilter.toLowerCase()) !== -1);
+            filteredRooms = this.rooms.filter(r => r.displayName.toLowerCase().indexOf(this.nameFilter.toLowerCase()) !== -1);
         }
 
-        return this.rooms;
+        if (this.defaultNumShown > 0 && !this.fullList) {
+            this.numHidden = Math.max(0, filteredRooms.length - this.defaultNumShown);
+            this.numExtraShown = 0;
+            filteredRooms = filteredRooms.slice(0, this.defaultNumShown);
+        } else if (this.defaultNumShown > 0) {
+            this.numExtraShown = Math.max(0, filteredRooms.length - this.defaultNumShown);
+            this.numHidden = 0;
+        }
+
+        return filteredRooms;
     }
 }

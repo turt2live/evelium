@@ -1,11 +1,26 @@
 <div class="tag">
-    <div class="name">
+    <div class="name" (click)="collapsed = !collapsed">
         <span class="title">{{ name }}</span>
-        <span class="collapse">
+        <span class="collapse" *ngIf="!collapsed">
             <i class="fa fa-chevron-down"></i>
         </span>
+        <span class="collapse" *ngIf="collapsed">
+            <i class="fa fa-chevron-right"></i>
+        </span>
     </div>
-    <div class="room-list">
+    <div class="room-list" *ngIf="!collapsed">
         <my-room-list-tile *ngFor="let room of filteredRooms()" [room]="room"></my-room-list-tile>
+        <div class="more-rooms" *ngIf="numHidden > 0" (click)="fullList = true">
+            <span>
+                {{ numHidden }} more room{{numHidden !== 1 ? "s" : ""}}
+                <i class="fa fa-chevron-down"></i>
+            </span>
+        </div>
+        <div class="more-rooms" *ngIf="numExtraShown > 0" (click)="fullList = false">
+            <span>
+                hide {{ numExtraShown }} room{{numHidden !== 1 ? "s" : ""}}
+                <i class="fa fa-chevron-up"></i>
+            </span>
+        </div>
     </div>
 </div>
