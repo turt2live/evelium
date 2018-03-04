@@ -1,0 +1,15 @@
+@import '../../../style/vars';
+
+.search-section {
+  padding-top: 15px;
+  padding-bottom: 15px;
+
+  .search {
+    width: calc(100% - 20px);
+    margin: auto;
+  }
+}
+
+.tag {
+  display: block;
+}

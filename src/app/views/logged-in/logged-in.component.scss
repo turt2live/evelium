@@ -1,19 +1,37 @@
 @import '../../../style/vars';
 
-.header {
-  text-align: center;
-  margin-top: 30px;
+.loading-page {
+  .header {
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  .header img {
+    padding: 20px;
+    width: 30rem;
+  }
+
+  .wrapper {
+    margin-top: 20px;
+  }
+
+  .center {
+    text-align: center;
+  }
 }
 
-.header img {
-  padding: 20px;
-  width: 30rem;
-}
+.chat {
+  background-color: $secondary_bg_color;
+  display: flex;
+  flex-wrap: nowrap;
 
-.wrapper {
-  margin-top: 20px;
-}
-
-.center {
-  text-align: center;
+  .room-list {
+    background-color: $primary_bg_color;
+    width: 250px;
+    height: 100vh;
+    max-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    order: 1;
+  }
 }

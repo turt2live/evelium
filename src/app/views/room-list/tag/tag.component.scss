@@ -1,0 +1,26 @@
+@import '../../../../style/vars';
+
+.name {
+  display: block;
+  color: $secondary_fg_color;
+  margin: 10px;
+  clear: both;
+
+  .title {
+    display: inline-block;
+    float: left;
+  }
+
+  .collapse {
+    display: inline-block;
+    float: right;
+  }
+}
+
+.room-list {
+  clear: both;
+
+  .room {
+    display: block;
+  }
+}

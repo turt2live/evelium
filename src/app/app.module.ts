@@ -18,6 +18,11 @@ import { LoginComponent } from "./views/login/login.component";
 import { MatrixAuthService } from "./services/matrix/auth.service";
 import { MatrixHomeserverService } from "./services/matrix/homeserver.service";
 import { HttpClientModule } from "@angular/common/http";
+import { MatrixSyncService } from "./services/matrix/sync.service";
+import { MatrixRoomService } from "./services/matrix/room.service";
+import { RoomListComponent } from "./views/room-list/room-list.component";
+import { RoomListTagComponent } from "./views/room-list/tag/tag.component";
+import { RoomListTileComponent } from "./views/room-list/tile/tile.component";
 
 @NgModule({
     imports: [
@@ -38,6 +43,9 @@ import { HttpClientModule } from "@angular/common/http";
         SpinnerComponent,
         LoggedInComponent,
         LoginComponent,
+        RoomListComponent,
+        RoomListTagComponent,
+        RoomListTileComponent,
 
         // Vendor
     ],
@@ -46,6 +54,8 @@ import { HttpClientModule } from "@angular/common/http";
         {provide: Storage, useValue: localStorage},
         MatrixAuthService,
         MatrixHomeserverService,
+        MatrixSyncService,
+        MatrixRoomService,
 
         // Vendor
     ],

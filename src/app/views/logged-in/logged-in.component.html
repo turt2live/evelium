@@ -1,8 +1,13 @@
-<div class="header">
-    <img src="/img/logo/name.svg">
-</div>
-<div class="wrapper">
-    <div class="center">
-        <h3>Welcome home. This is where your room list will be when we get that far.</h3>
+<div class="loading-page" *ngIf="!receivedRoomList">
+    <div class="header">
+        <img src="/img/logo/name.svg">
     </div>
+    <div class="wrapper">
+        <div class="center">
+            <h3>Welcome home. This is where your room list will be when we get that far.</h3>
+        </div>
+    </div>
+</div>
+<div class="chat" *ngIf="receivedRoomList">
+    <my-room-list class="room-list"></my-room-list>
 </div>
