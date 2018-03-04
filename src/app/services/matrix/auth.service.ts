@@ -44,4 +44,8 @@ export class MatrixAuthService {
             return r.user_id;
         });
     }
+
+    public static get USER_ID(): string {
+        return window.localStorage.getItem("mx.userId");
+    }
 }

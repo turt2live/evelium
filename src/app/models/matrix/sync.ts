@@ -5,6 +5,29 @@ import { RoomStateEvent } from "./events/room/state/room-state-event";
 import { RoomEvent } from "./events/room/room-event";
 import { EphemeralEvent } from "./events/ephemeral/ephemeral-event";
 
+export interface SyncJoinedRooms {
+    [roomId: string]: {
+        unread_notifications: {
+            highlight_count: number;
+            notification_count: number;
+        };
+        state: {
+            events: RoomStateEvent[];
+        };
+        ephemeral: {
+            events: EphemeralEvent[];
+        };
+        account_data: {
+            events: AccountDataEvent[];
+        };
+        timeline: {
+            limited: boolean;
+            prev_batch: string;
+            events: RoomEvent[];
+        };
+    }
+}
+
 export interface SyncResponse {
     next_batch: string;
     device_one_time_keys_count: any; // TODO: Determine
@@ -47,28 +70,7 @@ export interface SyncResponse {
                 };
             };
         };
-        join: {
-            [roomId: string]: {
-                unread_notifications: {
-                    highlight_count: number;
-                    notification_count: number;
-                };
-                state: {
-                    events: RoomStateEvent[];
-                };
-                ephemeral: {
-                    events: EphemeralEvent[];
-                };
-                account_data: {
-                    events: AccountDataEvent[];
-                };
-                timeline: {
-                    limited: boolean;
-                    prev_batch: string;
-                    events: RoomEvent[];
-                };
-            }
-        };
+        join: SyncJoinedRooms;
         invite: {
             [roomId: string]: {
                 invite_state: RoomStateEvent[];

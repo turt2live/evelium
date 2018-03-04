@@ -3,42 +3,123 @@ import { HttpClient } from "@angular/common/http";
 import { MatrixHomeserverService } from "./homeserver.service";
 import { AuthenticatedApi } from "./authenticated-api";
 import { MatrixAuthService } from "./auth.service";
-import { MatrixRoom, Room } from "../../models/matrix/dto/room";
+import { MatrixRoom } from "../../models/matrix/dto/room";
 import { RoomStateEvent } from "../../models/matrix/events/room/state/room-state-event";
-import { RoomAvatarEvent } from "../../models/matrix/events/room/state/m.room.avatar";
+import { MatrixAccountService } from "./account.service";
+import { DirectChatsEvent } from "../../models/matrix/events/account/m.direct";
+
+interface UsersToRoomsDmMap {
+    [userId: string]: string[]; // room IDs
+}
+
+interface RoomsToUsersDmMap {
+    [roomId: string]: string[]; // user IDs
+}
+
+interface DmMap {
+    users: UsersToRoomsDmMap;
+    rooms: RoomsToUsersDmMap;
+}
 
 @Injectable()
 export class MatrixRoomService extends AuthenticatedApi {
 
     private static ROOM_CACHE: { [roomId: string]: MatrixRoom } = {};
 
-    constructor(http: HttpClient, auth: MatrixAuthService, private hs: MatrixHomeserverService, private localStorage: Storage) {
+    private dmRoomMap: DmMap = {users: {}, rooms: {}};
+
+    constructor(http: HttpClient, auth: MatrixAuthService,
+                private hs: MatrixHomeserverService,
+                private account: MatrixAccountService,
+                private localStorage: Storage) {
         super(http, auth);
         console.log(this.localStorage.getItem("mx.syncToken"));
         console.log(this.hs.csApiUrl);
+
+        this.account.getAccountDataStream().subscribe(e => {
+            if (e.type !== "m.direct") return;
+            this.parseDirectChats(<DirectChatsEvent>e);
+        });
     }
 
     public getRoom(roomId: string): MatrixRoom {
         return MatrixRoomService.ROOM_CACHE[roomId];
     }
 
-    public cacheRoomFromState(roomId: string, state: RoomStateEvent[]): MatrixRoom {
-        const name = Room.getName(state, this.auth.userId);
-        const isDirect = false; // TODO: Get this from account data/invite event
+    private parseDirectChats(list: DirectChatsEvent): void {
+        const withUsers: UsersToRoomsDmMap = {};
+        const forRooms: RoomsToUsersDmMap = {};
 
-        const avatarEvent = <RoomAvatarEvent>state.find(e => e.type === "m.room.avatar");
-        const avatarMxc = avatarEvent && avatarEvent.content && avatarEvent.content.url ? avatarEvent.content.url : null;
+        const oldRooms = Object.keys(this.dmRoomMap.rooms);
+        for (const userId in list.content) {
+            if (!withUsers[userId]) withUsers[userId] = [];
 
-        const mtxRoom: MatrixRoom = {
-            id: roomId,
-            displayName: name,
-            avatarMxc: avatarMxc,
-            isDirect: isDirect,
-            state: state,
+            for (const roomId of list.content[userId]) {
+                if (!forRooms[roomId]) forRooms[roomId] = [];
+
+                withUsers[userId].push(roomId);
+                forRooms[roomId].push(userId);
+
+                const room = this.getRoom(roomId);
+                if (room) room.isDirect = true; // automagically saves
+            }
+        }
+
+        const notDirectIds = oldRooms.filter(rid => forRooms[rid] === undefined);
+        for (const roomId of notDirectIds) {
+            const room = this.getRoom(roomId);
+            if (room) room.isDirect = false; // automagically saves
+        }
+
+        console.log("Setting new DM Room Map");
+        this.dmRoomMap = {users: withUsers, rooms: forRooms};
+    }
+
+    public isDirect(roomId: string): boolean {
+        const users = this.dmRoomMap.rooms[roomId];
+        return users && users.length > 0;
+    }
+
+    public setDirect(roomId: string, withUsers: string[]): Promise<any> {
+        const newMap = <UsersToRoomsDmMap>JSON.parse(JSON.stringify(this.dmRoomMap.users));
+
+        for (const user of withUsers) {
+            if (!newMap[user]) newMap[user] = [];
+
+            const idx = newMap[user].indexOf(roomId);
+            if (idx === -1) newMap[user].push(roomId);
+        }
+
+        const event: DirectChatsEvent = {
+            type: "m.direct",
+            content: newMap,
         };
+        return this.account.setAccountData(event);
+    }
 
+    public setNotDirect(roomId: string): Promise<any> {
+        const withUsers = this.dmRoomMap.rooms[roomId];
+        if (!withUsers || withUsers.length === 0) return Promise.resolve(); // No changes needed
+
+        const newMap = <UsersToRoomsDmMap>JSON.parse(JSON.stringify(this.dmRoomMap.users));
+        for (const user of withUsers) {
+            if (newMap[user]) {
+                const idx = newMap[user].indexOf(roomId);
+                if (idx !== -1) newMap[user].splice(idx, 1);
+            }
+        }
+
+        const event: DirectChatsEvent = {
+            type: "m.direct",
+            content: newMap,
+        };
+        return this.account.setAccountData(event);
+    }
+
+    public cacheRoomFromState(roomId: string, state: RoomStateEvent[]): MatrixRoom {
+        const isDirect = this.isDirect(roomId);
+        const mtxRoom = new MatrixRoom(roomId, isDirect, state);
         MatrixRoomService.ROOM_CACHE[roomId] = mtxRoom;
-
         return mtxRoom;
     }
 }

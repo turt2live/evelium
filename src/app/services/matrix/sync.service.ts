@@ -3,11 +3,13 @@ import { HttpClient } from "@angular/common/http";
 import { MatrixHomeserverService } from "./homeserver.service";
 import { AuthenticatedApi } from "./authenticated-api";
 import { MatrixAuthService } from "./auth.service";
-import { SyncResponse } from "../../models/matrix/sync";
+import { SyncJoinedRooms, SyncResponse } from "../../models/matrix/sync";
 import { Observable } from "rxjs/Observable";
 import { MatrixRoom } from "../../models/matrix/dto/room";
 import { MatrixRoomService } from "./room.service";
 import { ReplaySubject } from "rxjs/ReplaySubject";
+import { MatrixAccountService } from "./account.service";
+import { AccountDataEvent } from "../../models/matrix/events/account/account-data-event";
 
 @Injectable()
 export class MatrixSyncService extends AuthenticatedApi {
@@ -20,6 +22,7 @@ export class MatrixSyncService extends AuthenticatedApi {
     constructor(http: HttpClient, auth: MatrixAuthService,
                 private hs: MatrixHomeserverService,
                 private rooms: MatrixRoomService,
+                private account: MatrixAccountService,
                 private localStorage: Storage) {
         super(http, auth);
         console.log(this.localStorage.getItem("mx.syncToken"));
@@ -39,13 +42,13 @@ export class MatrixSyncService extends AuthenticatedApi {
     public startSyncing(): void {
         if (MatrixSyncService.IS_SYNCING) return;
 
-        // TODO: Actually sync using intervals
         MatrixSyncService.IS_SYNCING = true;
         let nextToken: string = undefined;
         const handler = (r: SyncResponse) => {
-            this.parseSync(r);
-            nextToken = r.next_batch;
-            return this.doSync(nextToken).then(handler).catch(errorHandler);
+            return this.parseSync(r).then(() => {
+                nextToken = r.next_batch;
+                return this.doSync(nextToken).then(handler).catch(errorHandler);
+            });
         };
         const errorHandler = (e: Error) => {
             // TODO: Back off
@@ -64,20 +67,35 @@ export class MatrixSyncService extends AuthenticatedApi {
         return this.get<SyncResponse>(this.hs.buildCsUrl("sync"), request).toPromise();
     }
 
-    private parseSync(sync: SyncResponse): void {
-        if (!sync) return;
+    private parseSync(sync: SyncResponse): Promise<any> {
+        if (!sync) return Promise.resolve();
 
-        // Check joined rooms
-        if (sync.rooms && sync.rooms.join) {
-            for (const roomId in sync.rooms.join) {
-                const room = sync.rooms.join[roomId];
-                console.log(room);
-                if (!room.state || !room.state.events) {
-                    console.warn("Room " + roomId + " has no state in the timeline - skipping room");
-                }
-                const mtxRoom = this.rooms.cacheRoomFromState(roomId, room.state.events);
-                this.getBroadcastStream("self.room.join").next(mtxRoom);
-            }
+        const promises: Promise<any>[] = [];
+
+        if (sync.account_data && sync.account_data.events) {
+            promises.push(this.parseSyncAccountData(sync.account_data.events));
         }
+        if (sync.rooms && sync.rooms.join) {
+            promises.push(this.parseSyncJoinedRooms(sync.rooms.join));
+        }
+
+        return Promise.all(promises);
+    }
+
+    private parseSyncAccountData(events: AccountDataEvent[]): Promise<any> {
+        return Promise.all(events.map(event => this.account.setAccountData(event, true)));
+    }
+
+    private parseSyncJoinedRooms(joined: SyncJoinedRooms): Promise<any> {
+        for (const roomId in joined) {
+            const room = joined[roomId];
+            if (!room.state || !room.state.events) {
+                console.warn("Room " + roomId + " has no state in the timeline - skipping room");
+            }
+            const mtxRoom = this.rooms.cacheRoomFromState(roomId, room.state.events);
+            this.getBroadcastStream("self.room.join").next(mtxRoom);
+        }
+
+        return Promise.resolve();
     }
 }

@@ -3,28 +3,76 @@ import { RoomNameEvent } from "../events/room/state/m.room.name";
 import { RoomMemberEvent } from "../events/room/state/m.room.member";
 import { RoomCanonicalAliasEvent } from "../events/room/state/m.room.canonical_alias";
 import { User } from "./user";
+import { Observable } from "rxjs/Observable";
+import { ReplaySubject } from "rxjs/ReplaySubject";
+import { MatrixAuthService } from "../../../services/matrix/auth.service";
+import { RoomAvatarEvent } from "../events/room/state/m.room.avatar";
 
-export interface MatrixRoom {
-    id: string;
-    displayName: string;
-    avatarMxc: string;
-    isDirect: boolean;
-    state: RoomStateEvent[];
+export interface RoomUpdatedEvent {
+    room: MatrixRoom;
+    property: string;
 }
 
-export class Room {
-    private constructor() {
+export class MatrixRoom {
+    public static readonly UPDATED_STREAM: Observable<RoomUpdatedEvent> = new ReplaySubject<RoomUpdatedEvent>();
+
+    constructor(private _roomId: string,
+                private _isDirect: boolean,
+                private _state: RoomStateEvent[]) {
     }
 
-    public static getName(state: RoomStateEvent[], selfUserId: string): string {
-        const nameEvent = <RoomNameEvent>state.find(e => e.type === "m.room.name");
+    public get id(): string {
+        return this._roomId;
+    }
+
+    public get rawDisplayName(): string {
+        const event = <RoomNameEvent>this.state.find(e => e.type === "m.room.name");
+        return event && event.content ? event.content.name : undefined;
+    }
+
+    public get avatarMxc(): string {
+        const event = <RoomAvatarEvent>this.state.find(e => e.type === "m.room.avatar");
+        return event && event.content ? event.content.url : undefined;
+    }
+
+    public get isDirect(): boolean {
+        return this._isDirect;
+    }
+
+    public get state(): RoomStateEvent[] {
+        return this._state;
+    }
+
+    public set isDirect(isDirect: boolean) {
+        const old = this._isDirect;
+        this._isDirect = isDirect;
+        if (old !== this._isDirect) this.publishUpdate('isDirect');
+    }
+
+    public set state(state: RoomStateEvent[]) {
+        const old = this._state;
+        this._state = state;
+        if (old !== this._state) this.publishUpdate('state');
+    }
+
+    private publishUpdate(property: string): void {
+        (<ReplaySubject<RoomUpdatedEvent>>MatrixRoom.UPDATED_STREAM).next({
+            room: this,
+            property: property,
+        });
+    }
+
+    public get displayName(): string {
+        const selfUserId = MatrixAuthService.USER_ID;
+
+        const nameEvent = <RoomNameEvent>this._state.find(e => e.type === "m.room.name");
         if (nameEvent && nameEvent.content && nameEvent.content.name) return nameEvent.content.name;
 
-        const canonicalAliasEvent = <RoomCanonicalAliasEvent>state.find(e => e.type === "m.room.canonical_alias");
+        const canonicalAliasEvent = <RoomCanonicalAliasEvent>this._state.find(e => e.type === "m.room.canonical_alias");
         if (canonicalAliasEvent && canonicalAliasEvent.content && canonicalAliasEvent.content.alias)
             return canonicalAliasEvent.content.alias;
 
-        const allMembers = state.filter(e => e.type === "m.room.member").map(e => <RoomMemberEvent>e);
+        const allMembers = this._state.filter(e => e.type === "m.room.member").map(e => <RoomMemberEvent>e);
         const joinedMembers = allMembers
             .filter(e => e.content && (e.content.membership === "join" || e.content.membership === "invite"))
             .filter(e => e.state_key !== selfUserId);

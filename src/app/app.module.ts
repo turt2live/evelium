@@ -23,6 +23,7 @@ import { MatrixRoomService } from "./services/matrix/room.service";
 import { RoomListComponent } from "./views/room-list/room-list.component";
 import { RoomListTagComponent } from "./views/room-list/tag/tag.component";
 import { RoomListTileComponent } from "./views/room-list/tile/tile.component";
+import { MatrixAccountService } from "./services/matrix/account.service";
 
 @NgModule({
     imports: [
@@ -56,6 +57,7 @@ import { RoomListTileComponent } from "./views/room-list/tile/tile.component";
         MatrixHomeserverService,
         MatrixSyncService,
         MatrixRoomService,
+        MatrixAccountService,
 
         // Vendor
     ],
