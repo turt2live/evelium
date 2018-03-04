@@ -5,6 +5,12 @@ import { RoomStateEvent } from "./events/room/state/room-state-event";
 import { RoomEvent } from "./events/room/room-event";
 import { EphemeralEvent } from "./events/ephemeral/ephemeral-event";
 
+export interface RoomTimeline {
+    limited: boolean;
+    prev_batch: string;
+    events: RoomEvent[];
+}
+
 export interface SyncJoinedRooms {
     [roomId: string]: {
         unread_notifications: {
@@ -20,12 +26,8 @@ export interface SyncJoinedRooms {
         account_data: {
             events: AccountDataEvent[];
         };
-        timeline: {
-            limited: boolean;
-            prev_batch: string;
-            events: RoomEvent[];
-        };
-    }
+        timeline: RoomTimeline;
+    };
 }
 
 export interface SyncResponse {

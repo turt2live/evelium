@@ -3,13 +3,14 @@ import { HttpClient } from "@angular/common/http";
 import { MatrixHomeserverService } from "./homeserver.service";
 import { AuthenticatedApi } from "./authenticated-api";
 import { MatrixAuthService } from "./auth.service";
-import { SyncJoinedRooms, SyncResponse } from "../../models/matrix/sync";
+import { RoomTimeline, SyncJoinedRooms, SyncResponse } from "../../models/matrix/sync";
 import { Observable } from "rxjs/Observable";
 import { MatrixRoom } from "../../models/matrix/dto/room";
 import { MatrixRoomService } from "./room.service";
 import { ReplaySubject } from "rxjs/ReplaySubject";
 import { MatrixAccountService } from "./account.service";
 import { AccountDataEvent } from "../../models/matrix/events/account/account-data-event";
+import { RoomStateEvent } from "../../models/matrix/events/room/state/room-state-event";
 
 @Injectable()
 export class MatrixSyncService extends AuthenticatedApi {
@@ -88,20 +89,46 @@ export class MatrixSyncService extends AuthenticatedApi {
         for (const roomId in joined) {
             const room = joined[roomId];
 
-            const existingRoom = this.rooms.getRoom(roomId);
-            if (existingRoom) {
-                console.warn("Found existing room for " + roomId + " - skipping update for now (TODO)");
-                // TODO: Handle timeline/state updates/etc
-                continue;
+            let existingRoom = this.rooms.getRoom(roomId);
+            if (!existingRoom) {
+                if (!room.state || !room.state.events) {
+                    console.warn("Room " + roomId + " has no state - skipping room join");
+                    continue;
+                }
+                existingRoom = this.rooms.cacheRoomFromState(roomId, room.state.events);
+                this.getBroadcastStream("self.room.join").next(existingRoom);
             }
 
-            if (!room.state || !room.state.events) {
-                console.warn("Room " + roomId + " has no state in the timeline - skipping room");
-            }
-            const mtxRoom = this.rooms.cacheRoomFromState(roomId, room.state.events);
-            this.getBroadcastStream("self.room.join").next(mtxRoom);
+            this.processTimeline(existingRoom, room.timeline);
         }
 
         return Promise.resolve();
+    }
+
+    private processTimeline(room: MatrixRoom, timeline: RoomTimeline): void {
+        if (!timeline.events) return;
+
+        for (const event of timeline.events) {
+            // First see if we need to update our state
+            const stateEvent = <RoomStateEvent>event;
+            if (stateEvent.state_key !== undefined) {
+                console.log("Updating state event " + stateEvent.type + " in " + room.id);
+
+                // First remove the event we're replacing, if it exists
+                if (stateEvent.unsigned && stateEvent.unsigned.replaces_state) {
+                    const oldStateIdx = room.state.findIndex(e => e.event_id === stateEvent.unsigned.replaces_state);
+                    if (oldStateIdx !== -1) room.state.splice(oldStateIdx, 1);
+                }
+
+                // Remove anything that matches the type+state_key combo
+                const toRemove = room.state.filter(e => e.type === stateEvent.type && e.state_key === stateEvent.state_key);
+                toRemove.forEach(e => room.state.splice(room.state.indexOf(e), 1));
+
+                room.state.push(stateEvent);
+            }
+
+            // Now process the event as a regular timeline event
+            console.log("No timeline support yet for " + event.type);
+        }
     }
 }
