@@ -9,5 +9,7 @@
     </div>
 </div>
 <div class="chat" *ngIf="receivedRoomList">
-    <my-room-list class="room-list" [activeRoom]="activeRoom" (onRoomSelected)="onRoomSelected($event)"></my-room-list>
+    <perfect-scrollbar class="room-list">
+        <my-room-list [activeRoom]="activeRoom" (onRoomSelected)="onRoomSelected($event)"></my-room-list>
+    </perfect-scrollbar>
 </div>

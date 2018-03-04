@@ -65,6 +65,7 @@
     "json-loader": "^0.5.7",
     "moment": "^2.20.1",
     "ngx-modialog": "^5.0.0",
+    "ngx-perfect-scrollbar": "^5.3.5",
     "node-sass": "^4.7.2",
     "postcss-cssnext": "^3.1.0",
     "postcss-import": "^11.1.0",

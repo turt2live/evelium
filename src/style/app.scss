@@ -45,3 +45,8 @@ button {
   display: block;
   font-size: 12px;
 }
+
+// Hack to hide the rail background
+.ps__rail-y, .ps__rail-x {
+  background-color: rgba(0, 0, 0, 0) !important;
+}

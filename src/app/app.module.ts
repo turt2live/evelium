@@ -25,6 +25,14 @@ import { RoomListTagComponent } from "./views/room-list/tag/tag.component";
 import { RoomListTileComponent } from "./views/room-list/tile/tile.component";
 import { MatrixAccountService } from "./services/matrix/account.service";
 import { MatrixMediaService } from "./services/matrix/media.service";
+import {
+    PERFECT_SCROLLBAR_CONFIG, PerfectScrollbarConfigInterface,
+    PerfectScrollbarModule
+} from 'ngx-perfect-scrollbar';
+
+const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
+    suppressScrollX: true
+};
 
 @NgModule({
     imports: [
@@ -38,6 +46,7 @@ import { MatrixMediaService } from "./services/matrix/media.service";
         BrowserAnimationsModule,
         ModalModule.forRoot(),
         BootstrapModalModule,
+        PerfectScrollbarModule,
     ],
     declarations: [
         AppComponent,
@@ -54,6 +63,7 @@ import { MatrixMediaService } from "./services/matrix/media.service";
     providers: [
         {provide: Window, useValue: window},
         {provide: Storage, useValue: localStorage},
+        {provide: PERFECT_SCROLLBAR_CONFIG, useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG},
         MatrixAuthService,
         MatrixHomeserverService,
         MatrixSyncService,

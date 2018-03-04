@@ -11,7 +11,7 @@ export class RoomListTagComponent {
     @Input() public rooms: MatrixRoom[];
     @Input() public name: string;
     @Input() public nameFilter: string;
-    @Input() public defaultNumShown: number = -1;
+    @Input() public defaultNumShown = -1;
     @Input() public activeRoom: MatrixRoom;
     @Output() public onRoomSelected = new EventEmitter<MatrixRoom>();
 
