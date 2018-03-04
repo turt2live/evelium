@@ -87,6 +87,14 @@ export class MatrixSyncService extends AuthenticatedApi {
     private parseSyncJoinedRooms(joined: SyncJoinedRooms): Promise<any> {
         for (const roomId in joined) {
             const room = joined[roomId];
+
+            const existingRoom = this.rooms.getRoom(roomId);
+            if (existingRoom) {
+                console.warn("Found existing room for " + roomId + " - skipping update for now (TODO)");
+                // TODO: Handle timeline/state updates/etc
+                continue;
+            }
+
             if (!room.state || !room.state.events) {
                 console.warn("Room " + roomId + " has no state in the timeline - skipping room");
             }
