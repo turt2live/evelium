@@ -4,8 +4,8 @@
     </div>
     <div class="form">
         <form (submit)="login()" name="loginForm" novalidate>
-            <input type="text" placeholder="email@address.com" [(ngModel)]="username" [disabled]="isLoading" required/>
-            <input type="password" placeholder="password" [(ngModel)]="password" [disabled]="isLoading" required/>
+            <input type="text" placeholder="email@address.com" [(ngModel)]="username" [disabled]="isLoading" name="username" required/>
+            <input type="password" placeholder="password" [(ngModel)]="password" [disabled]="isLoading" name="password" required/>
             <button type="submit" title="sign in" [disabled]="isLoading">Sign In</button>
         </form>
         <div class="links">
