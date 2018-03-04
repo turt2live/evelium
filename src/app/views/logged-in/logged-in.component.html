@@ -1,12 +1,5 @@
-<div class="loading-page" *ngIf="!receivedRoomList">
-    <div class="header">
-        <img src="/img/logo/name.svg">
-    </div>
-    <div class="wrapper">
-        <div class="center">
-            <h3>Welcome home. This is where your room list will be when we get that far.</h3>
-        </div>
-    </div>
+<div class="loading" *ngIf="!receivedRoomList">
+    <my-spinner></my-spinner>
 </div>
 <div class="chat" *ngIf="receivedRoomList">
     <perfect-scrollbar class="room-list">
