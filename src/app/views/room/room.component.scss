@@ -1,2 +1,19 @@
 @import "../../../style/vars";
 
+.room {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .header {
+    flex: 0 0 auto;
+  }
+
+  .timeline {
+    flex: 1 1 auto;
+  }
+
+  .composer {
+    flex: 0 0 auto;
+  }
+}

@@ -8,6 +8,7 @@ import { ReplaySubject } from "rxjs/ReplaySubject";
 import { MatrixAuthService } from "../../../services/matrix/auth.service";
 import { RoomAvatarEvent } from "../events/room/state/m.room.avatar";
 import { RoomTopicEvent } from "../events/room/state/m.room.topic";
+import { IncompleteRoomEvent, RoomEvent } from "../events/room/room-event";
 
 export interface RoomUpdatedEvent {
     room: MatrixRoom;
@@ -19,7 +20,9 @@ export class MatrixRoom {
 
     constructor(private _roomId: string,
                 private _isDirect: boolean,
-                private _state: RoomStateEvent[]) {
+                private _state: RoomStateEvent[],
+                private _timeline: RoomEvent[] = [],
+                private _pendingEvents: IncompleteRoomEvent[] = []) {
     }
 
     public get id(): string {
@@ -56,6 +59,14 @@ export class MatrixRoom {
         return this._state;
     }
 
+    public get timeline(): RoomEvent[]{
+        return this._timeline;
+    }
+
+    public get pendingEvents(): IncompleteRoomEvent[]{
+        return this._pendingEvents;
+    }
+
     public set isDirect(isDirect: boolean) {
         const old = this._isDirect;
         this._isDirect = isDirect;
@@ -66,6 +77,18 @@ export class MatrixRoom {
         const old = this._state;
         this._state = state;
         if (old !== this._state) this.publishUpdate('state');
+    }
+
+    public set timeline(timeline: RoomEvent[]) {
+        const old = this._timeline;
+        this._timeline = timeline;
+        if (old !== this._timeline) this.publishUpdate('timeline');
+    }
+
+    public set pendingEvents(pendingEvents: IncompleteRoomEvent[]) {
+        const old = this._pendingEvents;
+        this._pendingEvents = pendingEvents;
+        if (old !== this._pendingEvents) this.publishUpdate('pendingEvents');
     }
 
     private publishUpdate(property: string): void {

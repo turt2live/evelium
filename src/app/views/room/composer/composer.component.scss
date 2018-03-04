@@ -1,0 +1,19 @@
+@import "../../../../style/vars";
+
+.composer {
+  display: flex;
+  border-top: 1px solid $composer_border_color;
+  background-color: $composer_bg_color;
+  padding: 5px 5px 5px 10px;
+
+  input {
+    flex: 1 1 auto;
+    background-color: $composer_bg_color;
+  }
+
+  .send-button {
+    flex: 0 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}

@@ -1,6 +1,14 @@
 <div class="room">
-    <my-room-header [room]="room"></my-room-header>
+    <my-room-header [room]="room" class="header"></my-room-header>
     <div class="timeline">
-        TODO: Timeline
+        <perfect-scrollbar>
+            <div *ngFor="let event of room.timeline">
+                {{ event.type }} sent by {{ event.sender }}
+            </div>
+            <div *ngFor="let event of room.pendingEvents" style="color: #cccccc">
+                {{ event.type }} with id {{ event.event_id }}
+            </div>
+        </perfect-scrollbar>
     </div>
+    <my-room-message-composer [room]="room" class="composer"></my-room-message-composer>
 </div>

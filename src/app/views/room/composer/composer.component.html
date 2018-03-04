@@ -1,0 +1,11 @@
+<form name="composer" (submit)="sendMessage()" novalidate class="composer">
+    <input type="text"
+           [(ngModel)]="message"
+           name="message"
+           placeholder="Send a message..."
+           autocomplete="off"
+    />
+    <button type="submit" class="send-button">
+        <i class="fa fa-paper-plane"></i>
+    </button>
+</form>

@@ -128,7 +128,7 @@ export class MatrixSyncService extends AuthenticatedApi {
             }
 
             // Now process the event as a regular timeline event
-            console.log("No timeline support yet for " + event.type);
+            room.timeline.push(event); // that's it!
         }
     }
 }
