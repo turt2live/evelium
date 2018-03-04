@@ -1,2 +1,15 @@
-<img class="avatar" *ngIf="hasUrl" [src]="avatarUrl" [ngStyle]="style" />
-<div class="avatar missing" *ngIf="!hasUrl" [ngStyle]="style">{{ displayName[0] }}</div>
+<!-- Preferred Avatar -->
+<img class="avatar"
+     *ngIf="hasUrl"
+     [hidden]="showPlaceholder"
+     [src]="avatarUrl"
+     [ngStyle]="style"
+     (error)="onImageError($event)"
+     (load)="onImageLoaded($event)"
+/>
+
+<!-- Missing Avatar -->
+<div class="avatar missing"
+     *ngIf="!hasUrl || showPlaceholder"
+     [ngStyle]="style"
+>{{ displayName[0] }}</div>

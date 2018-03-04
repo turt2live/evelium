@@ -7,6 +7,8 @@ export class AvatarComponent {
     @Input() public height: number;
     @Input() public scaleMethod: "scale" | "crop";
 
+    public showPlaceholder = true;
+
     constructor(protected media: MatrixMediaService) {
     }
 
@@ -36,5 +38,13 @@ export class AvatarComponent {
     public get avatarUrl(): string {
         if (!this.hasUrl) return null;
         return this.media.mxcToThumbnailUrl(this.mxcUrl, this.width, this.height, this.scaleMethod);
+    }
+
+    public onImageLoaded() {
+        this.showPlaceholder = false;
+    }
+
+    public onImageError() {
+        this.showPlaceholder = true;
     }
 }

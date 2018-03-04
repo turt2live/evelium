@@ -28,6 +28,8 @@ export class LoggedInComponent implements OnInit {
     }
 
     public onRoomSelected(room: MatrixRoom): void {
+        if (this.activeRoom && this.activeRoom.id === room.id) return; // Don't change to a room we're already in
+
         console.log("Changing room to " + (room ? room.id : "null"));
         this.activeRoom = room;
     }
