@@ -34,8 +34,8 @@ export class RoomListComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit() {
-        this.addTag(DIRECT_TAG_ID, "Direct chats", 10);
-        this.addTag(ROOMS_TAG_ID, "Rooms");
+        this.addTag(DIRECT_TAG_ID, "Direct chats", 5);
+        this.addTag(ROOMS_TAG_ID, "Rooms", 10);
 
         this.newRoomSubscription = this.sync.getStream<MatrixRoom>("self.room.join").subscribe(this.onNewRoom.bind(this));
         this.roomChangedSubscription = MatrixRoom.UPDATED_STREAM.subscribe(this.onRoomUpdated.bind(this));

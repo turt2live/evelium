@@ -21,8 +21,12 @@
       .timestamp {
         color: $event_tile_timestamp_fg_color;
         font-weight: 100;
-        margin-left: 10px;
+        margin-left: 2px;
       }
+    }
+
+    .body {
+      color: $event_tile_content_fg_color;
     }
   }
 }

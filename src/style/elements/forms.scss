@@ -1,10 +1,10 @@
 @import "../vars";
 
 input, button {
-  border: 1px solid $primary_border_color;
+  border: 1px solid $input_border_color;
   display: block;
-  color: $primary_fg_color;
-  background-color: $primary_bg_color;
+  color: $input_fg_color;
+  background-color: $input_bg_color;
   padding: 5px;
   margin: 0;
 }
