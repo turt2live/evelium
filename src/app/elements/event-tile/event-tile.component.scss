@@ -1,0 +1,28 @@
+@import "../../../style/vars";
+
+.tile {
+  padding-left: 10px;
+
+  .avatar {
+    float: left;
+  }
+
+  .content {
+    margin-left: 45px;
+
+    .sender-info {
+      font-size: 0.9em;
+      color: $event_tile_sender_info_fg_color;
+
+      .name {
+        font-weight: 600;
+      }
+
+      .timestamp {
+        color: $event_tile_timestamp_fg_color;
+        font-weight: 100;
+        margin-left: 10px;
+      }
+    }
+  }
+}

@@ -3,9 +3,9 @@ import { MatrixMediaService } from "../../services/matrix/media.service";
 
 export class AvatarComponent {
 
-    @Input() public width: number;
-    @Input() public height: number;
-    @Input() public scaleMethod: "scale" | "crop";
+    @Input() public width = 32;
+    @Input() public height = 32;
+    @Input() public scaleMethod: "scale" | "crop" = "crop";
 
     public showPlaceholder = true;
 

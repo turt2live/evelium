@@ -34,6 +34,8 @@ import { RoomAvatarComponent } from "./elements/avatar/room/room.component";
 import { RoomHeaderComponent } from "./views/room/header/header.component";
 import { RoomMessageComposerComponent } from "./views/room/composer/composer.component";
 import { MatrixEventService } from "./services/matrix/event.service";
+import { EventTileComponent } from "./elements/event-tile/event-tile.component";
+import { RoomMemberAvatarComponent } from "./elements/avatar/room-member/room-member.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     suppressScrollX: true
@@ -66,6 +68,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         RoomAvatarComponent,
         RoomHeaderComponent,
         RoomMessageComposerComponent,
+        EventTileComponent,
+        RoomMemberAvatarComponent,
 
         // Vendor
     ],

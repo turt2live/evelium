@@ -2,9 +2,12 @@
     <my-room-header [room]="room" class="header"></my-room-header>
     <div class="timeline ps" [perfectScrollbar]="">
         <div class="events">
-            <div class="event-tile" *ngFor="let event of room.timeline">
-                {{ event.sender }} sent a {{ event.type }}: {{ event.content.body }}
-            </div>
+            <my-event-tile class="event-tile"
+                           *ngFor="let event of room.timeline"
+                           [room]="room"
+                           [event]="event"
+                           [showSender]="shouldShowSender(event)"
+            ></my-event-tile>
             <div class="event-tile pending" *ngFor="let event of room.pendingEvents">
                 Pending event: {{ event.type }}
             </div>
