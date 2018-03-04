@@ -116,19 +116,19 @@ export class MatrixSyncService extends AuthenticatedApi {
 
                 // First remove the event we're replacing, if it exists
                 if (stateEvent.unsigned && stateEvent.unsigned.replaces_state) {
-                    const oldStateIdx = room.state.findIndex(e => e.event_id === stateEvent.unsigned.replaces_state);
-                    if (oldStateIdx !== -1) room.state.splice(oldStateIdx, 1);
+                    const oldStateEvent = room.state.find(e => e.event_id === stateEvent.unsigned.replaces_state);
+                    if (oldStateEvent) room.removeStateEvent(oldStateEvent);
                 }
 
                 // Remove anything that matches the type+state_key combo
                 const toRemove = room.state.filter(e => e.type === stateEvent.type && e.state_key === stateEvent.state_key);
-                toRemove.forEach(e => room.state.splice(room.state.indexOf(e), 1));
+                toRemove.forEach(e => room.removeStateEvent(e));
 
-                room.state.push(stateEvent);
+                room.addStateEvent(stateEvent);
             }
 
             // Now process the event as a regular timeline event
-            room.timeline.push(event); // that's it!
+            room.addTimelineEvent(event);
         }
     }
 }

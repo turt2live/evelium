@@ -59,11 +59,11 @@ export class MatrixRoom {
         return this._state;
     }
 
-    public get timeline(): RoomEvent[]{
+    public get timeline(): RoomEvent[] {
         return this._timeline;
     }
 
-    public get pendingEvents(): IncompleteRoomEvent[]{
+    public get pendingEvents(): IncompleteRoomEvent[] {
         return this._pendingEvents;
     }
 
@@ -138,6 +138,45 @@ export class MatrixRoom {
 
         if (sortedJoinedMembers.length > 2) {
             return `${User.getDisambiguatedName(sortedJoinedMembers[0].state_key, allMembers)} and ${joinedMembers.length - 1} other${joinedMembers.length - 1 !== 1 ? 's' : ''}`;
+        }
+    }
+
+    public addStateEvent(event: RoomStateEvent): void {
+        this.state.push(event);
+        this.publishUpdate("state");
+    }
+
+    public removeStateEvent(event: RoomStateEvent): void {
+        const idx = this.state.indexOf(event);
+        if (idx !== -1) {
+            this.state.splice(idx, 1);
+            this.publishUpdate("state");
+        }
+    }
+
+    public addTimelineEvent(event: RoomEvent): void {
+        this.timeline.push(event);
+        this.publishUpdate("timeline");
+    }
+
+    public removeTimelineEvent(event: RoomEvent): void {
+        const idx = this.timeline.indexOf(event);
+        if (idx !== -1) {
+            this.timeline.splice(idx, 1);
+            this.publishUpdate("timeline");
+        }
+    }
+
+    public addPendingEvent(event: IncompleteRoomEvent): void {
+        this.pendingEvents.push(event);
+        this.publishUpdate("pendingEvents");
+    }
+
+    public removePendingEvent(event: IncompleteRoomEvent): void {
+        const idx = this.pendingEvents.indexOf(event);
+        if (idx !== -1) {
+            this.pendingEvents.splice(idx, 1);
+            this.publishUpdate("pendingEvents");
         }
     }
 }

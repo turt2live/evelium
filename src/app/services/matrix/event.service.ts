@@ -31,10 +31,9 @@ export class MatrixEventService extends AuthenticatedApi {
         const action = `/rooms/${room.id}/send/${event.type}/${txnId}`;
 
         // Queue the event in the room's pending timeline
-        room.pendingEvents.push(event);
+        room.addPendingEvent(event);
         return this.put<SendEventResponse>(this.hs.buildCsUrl(action), event.content).toPromise().then(r => {
-            const idx = room.pendingEvents.indexOf(event);
-            if (idx !== -1) room.pendingEvents.splice(idx, 1);
+            room.removePendingEvent(event);
 
             event.event_id = r.event_id;
             return event;

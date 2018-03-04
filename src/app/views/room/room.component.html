@@ -1,14 +1,14 @@
 <div class="room">
     <my-room-header [room]="room" class="header"></my-room-header>
-    <div class="timeline">
-        <perfect-scrollbar>
-            <div *ngFor="let event of room.timeline">
-                {{ event.type }} sent by {{ event.sender }}
+    <div class="timeline ps" [perfectScrollbar]="">
+        <div class="events">
+            <div class="event-tile" *ngFor="let event of room.timeline">
+                {{ event.sender }} sent a {{ event.type }}: {{ event.content.body }}
             </div>
-            <div *ngFor="let event of room.pendingEvents" style="color: #cccccc">
-                {{ event.type }} with id {{ event.event_id }}
+            <div class="event-tile pending" *ngFor="let event of room.pendingEvents">
+                Pending event: {{ event.type }}
             </div>
-        </perfect-scrollbar>
+        </div>
     </div>
     <my-room-message-composer [room]="room" class="composer"></my-room-message-composer>
 </div>
