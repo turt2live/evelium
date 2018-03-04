@@ -1,16 +1,34 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { MatrixSyncService } from "../../services/matrix/sync.service";
+import { MatrixRoomService } from "../../services/matrix/room.service";
+import { MatrixRoom } from "../../models/matrix/dto/room";
 
 @Component({
     templateUrl: "./logged-in.component.html",
     styleUrls: ["./logged-in.component.scss"]
 })
-export class LoggedInComponent {
+export class LoggedInComponent implements OnInit {
 
     public receivedRoomList = false;
+    public activeRoom: MatrixRoom;
 
-    constructor(sync: MatrixSyncService) {
-        sync.startSyncing();
-        sync.getStream("self.room.join").subscribe(() => this.receivedRoomList = true);
+    constructor(private sync: MatrixSyncService, private rooms: MatrixRoomService) {
+        this.sync.startSyncing();
+    }
+
+    public ngOnInit() {
+        const roomSubscription = this.sync.getStream("self.room.join").subscribe(() => {
+            this.receivedRoomList = true;
+            roomSubscription.unsubscribe(); // we don't care anymore
+
+            // TODO: Replace this logic with a homepage (#43)
+            const allRooms = this.rooms.getAllRooms();
+            this.activeRoom = allRooms[Math.random() * allRooms.length];
+        });
+    }
+
+    public onRoomSelected(room: MatrixRoom): void {
+        console.log("Changing room to " + (room ? room.id : "null"));
+        this.activeRoom = room;
     }
 }

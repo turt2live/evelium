@@ -9,5 +9,5 @@
     </div>
 </div>
 <div class="chat" *ngIf="receivedRoomList">
-    <my-room-list class="room-list"></my-room-list>
+    <my-room-list class="room-list" [activeRoom]="activeRoom" (onRoomSelected)="onRoomSelected($event)"></my-room-list>
 </div>

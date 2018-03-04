@@ -22,10 +22,8 @@ export class MatrixSyncService extends AuthenticatedApi {
     constructor(http: HttpClient, auth: MatrixAuthService,
                 private hs: MatrixHomeserverService,
                 private rooms: MatrixRoomService,
-                private account: MatrixAccountService,
-                private localStorage: Storage) {
+                private account: MatrixAccountService) {
         super(http, auth);
-        console.log(this.localStorage.getItem("mx.syncToken"));
     }
 
     public getStream<T>(event: string): Observable<T> {

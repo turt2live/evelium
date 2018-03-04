@@ -24,6 +24,7 @@ import { RoomListComponent } from "./views/room-list/room-list.component";
 import { RoomListTagComponent } from "./views/room-list/tag/tag.component";
 import { RoomListTileComponent } from "./views/room-list/tile/tile.component";
 import { MatrixAccountService } from "./services/matrix/account.service";
+import { MatrixMediaService } from "./services/matrix/media.service";
 
 @NgModule({
     imports: [
@@ -58,6 +59,7 @@ import { MatrixAccountService } from "./services/matrix/account.service";
         MatrixSyncService,
         MatrixRoomService,
         MatrixAccountService,
+        MatrixMediaService,
 
         // Vendor
     ],

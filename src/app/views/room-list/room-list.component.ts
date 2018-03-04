@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from "@angular/core";
 import { MatrixSyncService } from "../../services/matrix/sync.service";
 import { MatrixRoom, RoomUpdatedEvent } from "../../models/matrix/dto/room";
 import { Subscription } from "rxjs/Subscription";
@@ -18,6 +18,9 @@ const DIRECT_TAG_ID = "io.evelium.direct";
     styleUrls: ["./room-list.component.scss"]
 })
 export class RoomListComponent implements OnInit, OnDestroy {
+
+    @Input() public activeRoom: MatrixRoom;
+    @Output() public onRoomSelected = new EventEmitter<MatrixRoom>();
 
     public tags: TaggedRoomList[] = [];
     public search: string;

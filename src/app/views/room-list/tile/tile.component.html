@@ -1,3 +1,5 @@
-<div class="tile">
-    {{ room.displayName }}
+<div class="tile" (click)="onTileClick()" [ngClass]="{'active': isActive, 'idle': !isActive}">
+    <img class="avatar" *ngIf="room.avatarMxc" [src]="media.mxcToThumbnailUrl(room.avatarMxc, 32, 32, 'crop')"/>
+    <div class="avatar missing" *ngIf="!room.avatarMxc">{{ room.displayName[0] }}</div>
+    <div class="name" title="{{room.displayName}}">{{ room.displayName }}</div>
 </div>

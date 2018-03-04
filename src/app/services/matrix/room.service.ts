@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { MatrixHomeserverService } from "./homeserver.service";
 import { AuthenticatedApi } from "./authenticated-api";
 import { MatrixAuthService } from "./auth.service";
 import { MatrixRoom } from "../../models/matrix/dto/room";
@@ -29,12 +28,8 @@ export class MatrixRoomService extends AuthenticatedApi {
     private dmRoomMap: DmMap = {users: {}, rooms: {}};
 
     constructor(http: HttpClient, auth: MatrixAuthService,
-                private hs: MatrixHomeserverService,
-                private account: MatrixAccountService,
-                private localStorage: Storage) {
+                private account: MatrixAccountService) {
         super(http, auth);
-        console.log(this.localStorage.getItem("mx.syncToken"));
-        console.log(this.hs.csApiUrl);
 
         this.account.getAccountDataStream().subscribe(e => {
             if (e.type !== "m.direct") return;
@@ -44,6 +39,10 @@ export class MatrixRoomService extends AuthenticatedApi {
 
     public getRoom(roomId: string): MatrixRoom {
         return MatrixRoomService.ROOM_CACHE[roomId];
+    }
+
+    public getAllRooms(): MatrixRoom[] {
+        return Object.keys(MatrixRoomService.ROOM_CACHE).map(id => MatrixRoomService.ROOM_CACHE[id]);
     }
 
     private parseDirectChats(list: DirectChatsEvent): void {

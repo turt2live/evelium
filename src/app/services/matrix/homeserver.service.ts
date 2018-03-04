@@ -14,6 +14,24 @@ export class MatrixHomeserverService {
         this.localStorage.setItem("mx.csApiUrl", newUrl);
     }
 
+    public get mediaApiUrl(): string {
+        // The media API is technically under the same place as the CS API
+        return this.localStorage.getItem("mx.csApiUrl");
+    }
+
+    public set mediaApiUrl(newUrl: string) {
+        // The media API is technically under the same place as the CS API
+        this.localStorage.setItem("mx.csApiUrl", newUrl);
+    }
+
+    public buildMediaUrl(action: string, version="r0"):string {
+        let baseUrl = this.mediaApiUrl;
+        if (baseUrl.endsWith("/")) baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+        if (action.startsWith("/")) action = action.substring(1);
+
+        return `${baseUrl}/media/${version}/${action}`;
+    }
+
     public buildCsUrl(action: string, version = "r0"): string {
         let baseUrl = this.csApiUrl;
         if (baseUrl.endsWith("/")) baseUrl = baseUrl.substring(0, baseUrl.length - 1);

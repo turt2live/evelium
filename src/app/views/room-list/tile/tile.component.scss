@@ -1,5 +1,52 @@
 @import '../../../../style/vars';
 
+$avatar-size: 32px;
+
 .tile {
   margin-left: 20px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  .avatar {
+    width: $avatar-size;
+    height: $avatar-size;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .avatar.missing {
+    background-color: #34445a;
+    color: #bbb;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: $avatar-size;
+    font-size: $avatar-size*0.65;
+  }
+
+  .name {
+    width: calc(100% - #{$avatar-size} - 10px);
+    padding-left: 5px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}
+
+.tile.idle {
+  color: $room_list_idle_color;
+}
+
+.tile.active {
+  color: $room_list_selected_color;
+}
+
+.tile.activity {
+  color: $room_list_activity_color;
+  font-weight: 700;
+}
+
+.tile.idle:hover {
+  color: $room_list_activity_color;
 }

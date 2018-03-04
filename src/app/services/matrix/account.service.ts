@@ -13,9 +13,9 @@ export class MatrixAccountService extends AuthenticatedApi {
     private static ACCOUNT_DATA: { [eventType: string]: AccountDataEvent } = {};
     private static ACCOUNT_DATA_STREAM = new ReplaySubject<AccountDataEvent>();
 
-    constructor(http: HttpClient, auth: MatrixAuthService, private hs: MatrixHomeserverService, private localStorage: Storage) {
+    constructor(http: HttpClient, auth: MatrixAuthService,
+                private hs: MatrixHomeserverService) {
         super(http, auth);
-        console.log(this.localStorage.getItem("mx.syncToken"));
     }
 
     public getAccountDataStream(): Observable<AccountDataEvent> {
