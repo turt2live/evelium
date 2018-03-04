@@ -32,6 +32,13 @@ export class MatrixRoom {
 
     public get avatarMxc(): string {
         const event = <RoomAvatarEvent>this.state.find(e => e.type === "m.room.avatar");
+        if (!event || !event.content || !event.content.url) {
+            const joinedMembers = this.state.filter(e => e.type === "m.room.member")
+                .map(e => <RoomMemberEvent>e)
+                .filter(e => e.state_key !== MatrixAuthService.USER_ID)
+                .filter(e => e.content && (e.content.membership === "invite" || e.content.membership === "join"));
+            if (joinedMembers.length === 1) return joinedMembers[0].content.avatar_url;
+        }
         return event && event.content ? event.content.url : undefined;
     }
 

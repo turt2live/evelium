@@ -15,10 +15,10 @@ export class RoomListTagComponent {
     @Input() public activeRoom: MatrixRoom;
     @Output() public onRoomSelected = new EventEmitter<MatrixRoom>();
 
-    public fullList: boolean = false;
-    public numHidden: number = 0;
-    public numExtraShown: number = 0;
-    public collapsed: boolean = false;
+    public fullList = false;
+    public numHidden = 0;
+    public numExtraShown = 0;
+    public collapsed = false;
 
     constructor() {
     }
