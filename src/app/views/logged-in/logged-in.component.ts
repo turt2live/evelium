@@ -23,7 +23,7 @@ export class LoggedInComponent implements OnInit {
 
             // TODO: Replace this logic with a homepage (#43)
             const allRooms = this.rooms.getAllRooms();
-            this.activeRoom = allRooms[Math.random() * allRooms.length];
+            this.activeRoom = allRooms[0];
         });
     }
 

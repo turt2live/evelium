@@ -9,6 +9,17 @@ $primary_border_color: #999999;
 $secondary_border_color: #666666;
 $tertiary_border_color: #444444;
 
+$room_list_bg_color: $primary_bg_color;
+$room_list_border_color: $tertiary_border_color;
+$room_list_tag_name_color: $secondary_fg_color;
+$room_list_more_rooms_color: $tertiary_fg_color;
+$room_list_more_rooms_dash_color: $tertiary_border_color;
+$room_list_more_rooms_hover_color: $secondary_fg_color;
 $room_list_selected_color: $primary_fg_color;
 $room_list_activity_color: $secondary_fg_color;
 $room_list_idle_color: $tertiary_fg_color;
+
+$room_header_bg_color: #525252;
+$room_header_name_color: $primary_fg_color;
+$room_header_topic_color: $secondary_fg_color;
+$room_header_border_color: $tertiary_border_color;

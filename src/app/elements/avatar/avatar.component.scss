@@ -1,0 +1,18 @@
+// component styles are encapsulated and only applied to their components
+@import "../../../style/vars";
+
+.avatar {
+  //width: $avatar-size;
+  //height: $avatar-size;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.avatar.missing {
+  background-color: #34445a;
+  color: #bbb;
+  text-transform: uppercase;
+  text-align: center;
+  //line-height: $avatar-size;
+  //font-size: $avatar-size*0.65;
+}

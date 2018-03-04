@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { MatrixRoom } from "../../../models/matrix/dto/room";
-import { MatrixMediaService } from "../../../services/matrix/media.service";
 
 @Component({
     selector: "my-room-list-tile",
@@ -13,7 +12,7 @@ export class RoomListTileComponent {
     @Input() public isActive: boolean;
     @Output() public onClick = new EventEmitter();
 
-    constructor(public media: MatrixMediaService) {
+    constructor() {
     }
 
     public onTileClick(): void {

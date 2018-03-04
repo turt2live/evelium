@@ -1,0 +1,32 @@
+@import "../../../../style/vars";
+
+.header {
+  display: flex;
+  border-bottom: 1px solid $room_header_border_color;
+  background-color: $room_header_bg_color;
+  padding: 5px 5px 5px 10px;
+
+  .avatar {
+    order: 1;
+    width: 64px;
+    margin-right: 10px;
+  }
+
+  .middle {
+    order: 2;
+    flex-grow: 1;
+    align-self: center;
+
+    .name {
+      display: block;
+      font-size: 1.5em;
+      color: $room_header_name_color;
+    }
+
+    .topic {
+      display: block;
+      color: $room_header_topic_color;
+      font-size: 0.8em;
+    }
+  }
+}

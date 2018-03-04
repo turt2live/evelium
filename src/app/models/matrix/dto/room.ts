@@ -7,6 +7,7 @@ import { Observable } from "rxjs/Observable";
 import { ReplaySubject } from "rxjs/ReplaySubject";
 import { MatrixAuthService } from "../../../services/matrix/auth.service";
 import { RoomAvatarEvent } from "../events/room/state/m.room.avatar";
+import { RoomTopicEvent } from "../events/room/state/m.room.topic";
 
 export interface RoomUpdatedEvent {
     room: MatrixRoom;
@@ -40,6 +41,11 @@ export class MatrixRoom {
             if (joinedMembers.length === 1) return joinedMembers[0].content.avatar_url;
         }
         return event && event.content ? event.content.url : undefined;
+    }
+
+    public get topic(): string {
+        const event = <RoomTopicEvent>this.state.find(e => e.type === "m.room.topic");
+        return event && event.content ? event.content.topic : undefined;
     }
 
     public get isDirect(): boolean {

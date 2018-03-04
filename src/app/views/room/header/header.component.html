@@ -1,0 +1,7 @@
+<div class="header">
+    <my-room-avatar class="avatar" [room]="room" [width]="64" [height]="64" scaleMethod="crop"></my-room-avatar>
+    <div class="middle">
+        <span class="name">{{ room.displayName }}</span>
+        <span class="topic" *ngIf="room.topic">{{ room.topic }}</span>
+    </div>
+</div>

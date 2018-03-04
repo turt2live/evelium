@@ -2,7 +2,7 @@
 
 .name {
   display: block;
-  color: $secondary_fg_color;
+  color: $room_list_tag_name_color;
   margin: 10px;
   clear: both;
   cursor: pointer;
@@ -28,7 +28,7 @@
   .more-rooms {
     display: block;
     text-align: center;
-    color: $tertiary_fg_color;
+    color: $room_list_more_rooms_color;
     font-size: 0.7em;
     line-height: 0.5;
     margin-top: 10px;
@@ -45,7 +45,7 @@
       width: 100%;
       position: absolute;
       top: 0;
-      border-bottom: 1px dashed $tertiary_border_color;
+      border-bottom: 1px dashed $room_list_more_rooms_dash_color;
     }
 
     span:before {
@@ -60,6 +60,6 @@
   }
 
   .more-rooms:hover {
-    color: $secondary_fg_color;
+    color: $room_list_more_rooms_hover_color;
   }
 }

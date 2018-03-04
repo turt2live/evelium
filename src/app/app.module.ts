@@ -29,6 +29,9 @@ import {
     PERFECT_SCROLLBAR_CONFIG, PerfectScrollbarConfigInterface,
     PerfectScrollbarModule
 } from 'ngx-perfect-scrollbar';
+import { RoomComponent } from "./views/room/room.component";
+import { RoomAvatarComponent } from "./elements/avatar/room/room.component";
+import { RoomHeaderComponent } from "./views/room/header/header.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     suppressScrollX: true
@@ -57,6 +60,9 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         RoomListComponent,
         RoomListTagComponent,
         RoomListTileComponent,
+        RoomComponent,
+        RoomAvatarComponent,
+        RoomHeaderComponent,
 
         // Vendor
     ],

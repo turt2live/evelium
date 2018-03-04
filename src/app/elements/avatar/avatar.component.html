@@ -1,0 +1,2 @@
+<img class="avatar" *ngIf="hasUrl" [src]="avatarUrl" [ngStyle]="style" />
+<div class="avatar missing" *ngIf="!hasUrl" [ngStyle]="style">{{ displayName[0] }}</div>

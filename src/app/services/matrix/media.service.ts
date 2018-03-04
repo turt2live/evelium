@@ -28,4 +28,12 @@ export class MatrixMediaService extends AuthenticatedApi {
         const parts = mxc.split("/");
         return parts[0] + "/" + parts[1];
     }
+
+    public static isValidMxc(url: string): boolean {
+        if (!url) return false;
+        if (!url.startsWith("mxc://")) return false;
+
+        const parts = url.substring("mxc://".length).split("?")[0].split("/");
+        return parts.length >= 2;
+    }
 }
