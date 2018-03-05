@@ -1,0 +1,18 @@
+@import "../../../../style/vars";
+
+.tile {
+  padding-left: 10px;
+
+  .avatar {
+  }
+
+  .body {
+    color: $event_tile_state_content_fg_color;
+  }
+
+  .timestamp {
+    color: $event_tile_timestamp_fg_color;
+    font-weight: 100;
+    margin-left: 2px;
+  }
+}

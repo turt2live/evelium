@@ -37,6 +37,7 @@ import { MatrixEventService } from "./services/matrix/event.service";
 import { MessageEventTileComponent } from "./elements/event-tiles/message/message.component";
 import { RoomMemberAvatarComponent } from "./elements/avatar/room-member/room-member.component";
 import { EventTileComponent } from "./elements/event-tiles/event-tile.component";
+import { MemberEventTileComponent } from "./elements/event-tiles/member/member.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 
@@ -70,6 +71,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         MessageEventTileComponent,
         RoomMemberAvatarComponent,
         EventTileComponent,
+        MemberEventTileComponent,
 
         // Vendor
     ],
@@ -91,6 +93,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
     entryComponents: [
         // Event tiles
         MessageEventTileComponent,
+        MemberEventTileComponent,
     ]
 })
 export class AppModule {

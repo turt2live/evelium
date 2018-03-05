@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { RoomMemberEvent } from "../../../models/matrix/events/room/state/m.room.member";
 import { User } from "../../../models/matrix/dto/user";
-import { DynamicEventTileComponent } from "../event-tile.component";
+import { EventTileComponentBase } from "../event-tile.component.base";
 import moment = require("moment");
 
 @Component({
@@ -9,7 +9,7 @@ import moment = require("moment");
     templateUrl: "./message.component.html",
     styleUrls: ["./message.component.scss"]
 })
-export class MessageEventTileComponent extends DynamicEventTileComponent {
+export class MessageEventTileComponent extends EventTileComponentBase {
 
     constructor() {
         super();

@@ -1,0 +1,11 @@
+<div class="tile">
+    <my-room-member-avatar [room]="room"
+                           [userId]="event.state_key"
+                           class="avatar"
+                           [width]="15"
+                           [height]="15"
+                           [usePrevious]="isLeaving"
+    ></my-room-member-avatar>
+    <span class="body">{{ description }}</span>
+    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+</div>
