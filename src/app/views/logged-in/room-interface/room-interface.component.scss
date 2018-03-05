@@ -1,11 +1,4 @@
-@import '../../../style/vars';
-
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 60px;
-}
+@import "../../../../style/vars";
 
 .chat {
   background-color: $secondary_bg_color;

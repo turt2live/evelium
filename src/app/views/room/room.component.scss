@@ -1,5 +1,9 @@
 @import "../../../style/vars";
 
+.loading {
+  display: flex;
+}
+
 .room {
   display: flex;
   flex-direction: column;

@@ -1,4 +1,7 @@
-<div class="room">
+<div class="loading" *ngIf="!room">
+    <my-spinner></my-spinner>
+</div>
+<div class="room" *ngIf="room">
     <my-room-header [room]="room" class="header"></my-room-header>
     <div class="timeline ps" [perfectScrollbar]="">
         <div class="events">

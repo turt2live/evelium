@@ -112,7 +112,7 @@ export class MatrixSyncService extends AuthenticatedApi {
             // First see if we need to update our state
             const stateEvent = <RoomStateEvent>event;
             if (stateEvent.state_key !== undefined) {
-                console.log("Updating state event " + stateEvent.type + " in " + room.id);
+                //console.log("Updating state event " + stateEvent.type + " in " + room.id);
 
                 // First remove the event we're replacing, if it exists
                 if (stateEvent.unsigned && stateEvent.unsigned.replaces_state) {

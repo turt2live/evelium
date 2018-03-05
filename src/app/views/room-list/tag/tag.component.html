@@ -12,7 +12,6 @@
         <my-room-list-tile *ngFor="let room of filteredRooms()"
                            [room]="room"
                            [isActive]="activeRoom && activeRoom.id === room.id"
-                           (onClick)="onTileClick(room)"
         ></my-room-list-tile>
         <div class="more-rooms" *ngIf="numHidden > 0" (click)="fullList = true">
             <span>

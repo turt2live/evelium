@@ -1,4 +1,4 @@
-import { ApplicationRef, Injector, NgModule } from "@angular/core";
+import { ApplicationRef, ErrorHandler, Injector, NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { AppComponent } from "./app.component";
 import { FormsModule } from "@angular/forms";
@@ -38,6 +38,9 @@ import { MessageEventTileComponent } from "./elements/event-tiles/message/messag
 import { RoomMemberAvatarComponent } from "./elements/avatar/room-member/room-member.component";
 import { EventTileComponent } from "./elements/event-tiles/event-tile.component";
 import { MemberEventTileComponent } from "./elements/event-tiles/member/member.component";
+import { AppErrorHandler } from "./app.error-handler";
+import { RoomInterfaceComponent } from "./views/logged-in/room-interface/room-interface.component";
+import { HomepageComponent } from "./views/logged-in/homepage/homepage.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 
@@ -72,6 +75,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         RoomMemberAvatarComponent,
         EventTileComponent,
         MemberEventTileComponent,
+        RoomInterfaceComponent,
+        HomepageComponent,
 
         // Vendor
     ],
@@ -79,6 +84,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         {provide: Window, useValue: window},
         {provide: Storage, useValue: localStorage},
         {provide: PERFECT_SCROLLBAR_CONFIG, useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG},
+        {provide: ErrorHandler, useClass: AppErrorHandler},
         MatrixAuthService,
         MatrixHomeserverService,
         MatrixSyncService,

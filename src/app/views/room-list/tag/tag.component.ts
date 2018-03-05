@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { MatrixRoom } from "../../../models/matrix/dto/room";
 
 @Component({
@@ -13,7 +13,6 @@ export class RoomListTagComponent {
     @Input() public nameFilter: string;
     @Input() public defaultNumShown = -1;
     @Input() public activeRoom: MatrixRoom;
-    @Output() public onRoomSelected = new EventEmitter<MatrixRoom>();
 
     public fullList = false;
     public numHidden = 0;
@@ -39,9 +38,5 @@ export class RoomListTagComponent {
         }
 
         return filteredRooms;
-    }
-
-    public onTileClick(room: MatrixRoom) {
-        this.onRoomSelected.emit(room);
     }
 }

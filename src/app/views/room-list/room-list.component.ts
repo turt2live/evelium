@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from "@angular/core";
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { MatrixSyncService } from "../../services/matrix/sync.service";
 import { MatrixRoom, RoomUpdatedEvent } from "../../models/matrix/dto/room";
 import { Subscription } from "rxjs/Subscription";
@@ -20,8 +20,6 @@ const DIRECT_TAG_ID = "io.evelium.direct";
 export class RoomListComponent implements OnInit, OnDestroy {
 
     @Input() public activeRoom: MatrixRoom;
-    @Output() public onRoomSelected = new EventEmitter<MatrixRoom>();
-
     public tags: TaggedRoomList[] = [];
     public search: string;
 
@@ -29,6 +27,7 @@ export class RoomListComponent implements OnInit, OnDestroy {
 
     private newRoomSubscription: Subscription;
     private roomChangedSubscription: Subscription;
+    private paramsSubscription: Subscription;
 
     constructor(private sync: MatrixSyncService) {
     }
@@ -44,6 +43,7 @@ export class RoomListComponent implements OnInit, OnDestroy {
     public ngOnDestroy() {
         if (this.newRoomSubscription) this.newRoomSubscription.unsubscribe();
         if (this.roomChangedSubscription) this.roomChangedSubscription.unsubscribe();
+        if (this.paramsSubscription) this.paramsSubscription.unsubscribe();
     }
 
     private onNewRoom(room: MatrixRoom): void {

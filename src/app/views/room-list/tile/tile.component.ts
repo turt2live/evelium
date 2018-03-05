@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { MatrixRoom } from "../../../models/matrix/dto/room";
+import { Router } from "@angular/router";
 
 @Component({
     selector: "my-room-list-tile",
@@ -10,12 +11,11 @@ export class RoomListTileComponent {
 
     @Input() public room: MatrixRoom;
     @Input() public isActive: boolean;
-    @Output() public onClick = new EventEmitter();
 
-    constructor() {
+    constructor(private router: Router) {
     }
 
     public onTileClick(): void {
-        this.onClick.emit();
+        this.router.navigate(['/app/rooms/', this.room.id]);
     }
 }
