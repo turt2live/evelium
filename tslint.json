@@ -5,8 +5,7 @@
   "rules": {
     "class-name": false,
     "comment-format": [
-      true,
-      "check-space"
+      true
     ],
     "curly": false,
     "eofline": false,
