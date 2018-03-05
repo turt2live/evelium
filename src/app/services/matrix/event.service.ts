@@ -5,7 +5,7 @@ import { MatrixAuthService } from "./auth.service";
 import { MatrixRoom } from "../../models/matrix/dto/room";
 import { MatrixHomeserverService } from "./homeserver.service";
 import { IncompleteRoomEvent, RoomEvent } from "../../models/matrix/events/room/room-event";
-import { SendEventResponse } from "../../models/matrix/events";
+import { SendEventResponse } from "../../models/matrix/http/events";
 
 @Injectable()
 export class MatrixEventService extends AuthenticatedApi {

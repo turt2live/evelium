@@ -3,7 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { MatrixHomeserverService } from "./homeserver.service";
 import { AuthenticatedApi } from "./authenticated-api";
 import { MatrixAuthService } from "./auth.service";
-import { RoomTimeline, SyncJoinedRooms, SyncResponse } from "../../models/matrix/sync";
+import { RoomTimeline, SyncJoinedRooms, SyncResponse } from "../../models/matrix/http/sync";
 import { Observable } from "rxjs/Observable";
 import { MatrixRoom } from "../../models/matrix/dto/room";
 import { MatrixRoomService } from "./room.service";

@@ -1,9 +1,9 @@
-import { AccountDataEvent } from "./events/account/account-data-event";
-import { MatrixEvent } from "./events/event";
-import { PresenceEvent } from "./events/ephemeral/m.presence";
-import { RoomStateEvent } from "./events/room/state/room-state-event";
-import { RoomEvent } from "./events/room/room-event";
-import { EphemeralEvent } from "./events/ephemeral/ephemeral-event";
+import { AccountDataEvent } from "../events/account/account-data-event";
+import { MatrixEvent } from "../events/event";
+import { PresenceEvent } from "../events/ephemeral/m.presence";
+import { RoomStateEvent } from "../events/room/state/room-state-event";
+import { RoomEvent } from "../events/room/room-event";
+import { EphemeralEvent } from "../events/ephemeral/ephemeral-event";
 
 export interface RoomTimeline {
     limited: boolean;

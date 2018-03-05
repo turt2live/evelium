@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { MatrixHomeserverService } from "./homeserver.service";
-import { LoginResponse, PasswordLoginRequest } from "../../models/matrix/login";
+import { LoginResponse, PasswordLoginRequest } from "../../models/matrix/http/login";
 
 @Injectable()
 export class MatrixAuthService {
