@@ -4,13 +4,9 @@
         <div class="events">
             <my-event-tile class="event-tile"
                            *ngFor="let event of room.timeline"
-                           [room]="room"
                            [event]="event"
-                           [showSender]="shouldShowSender(event)"
+                           [room]="room"
             ></my-event-tile>
-            <div class="event-tile pending" *ngFor="let event of room.pendingEvents">
-                Pending event: {{ event.type }}
-            </div>
         </div>
     </div>
     <my-room-message-composer [room]="room" class="composer"></my-room-message-composer>

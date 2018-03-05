@@ -2,7 +2,6 @@ import { Component, Input, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { MatrixRoom, RoomUpdatedEvent } from "../../models/matrix/dto/room";
 import { Subscription } from "rxjs/Subscription";
 import { PerfectScrollbarDirective } from "ngx-perfect-scrollbar";
-import { RoomEvent } from "../../models/matrix/events/room/room-event";
 
 @Component({
     selector: "my-room",
@@ -32,13 +31,5 @@ export class RoomComponent implements OnInit, OnDestroy {
         if (!this.room || event.room.id !== this.room.id) return;
         if (event.property !== "timeline" && event.property !== "pendingEvents") return;
         if (this.timelineScrollDirective) this.timelineScrollDirective.scrollToBottom();
-    }
-
-    public shouldShowSender(event: RoomEvent): boolean {
-        const idx = this.room.timeline.indexOf(event);
-        if (idx > 0) {
-            const previousEvent = this.room.timeline[idx - 1];
-            return previousEvent.sender !== event.sender;
-        } else return true;
     }
 }

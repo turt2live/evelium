@@ -34,8 +34,9 @@ import { RoomAvatarComponent } from "./elements/avatar/room/room.component";
 import { RoomHeaderComponent } from "./views/room/header/header.component";
 import { RoomMessageComposerComponent } from "./views/room/composer/composer.component";
 import { MatrixEventService } from "./services/matrix/event.service";
-import { EventTileComponent } from "./elements/event-tile/event-tile.component";
+import { MessageEventTileComponent } from "./elements/event-tiles/message/message.component";
 import { RoomMemberAvatarComponent } from "./elements/avatar/room-member/room-member.component";
+import { EventTileComponent } from "./elements/event-tiles/event-tile.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 
@@ -66,8 +67,9 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         RoomAvatarComponent,
         RoomHeaderComponent,
         RoomMessageComposerComponent,
-        EventTileComponent,
+        MessageEventTileComponent,
         RoomMemberAvatarComponent,
+        EventTileComponent,
 
         // Vendor
     ],
@@ -86,7 +88,10 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         // Vendor
     ],
     bootstrap: [AppComponent],
-    entryComponents: []
+    entryComponents: [
+        // Event tiles
+        MessageEventTileComponent,
+    ]
 })
 export class AppModule {
     constructor(public appRef: ApplicationRef, injector: Injector) {
