@@ -15,7 +15,7 @@ export class LoggedInComponent implements OnInit {
 
     public ngOnInit() {
         this.sync.startSyncing();
-        const roomSubscription = this.sync.getStream("self.room.join").subscribe(() => {
+        const roomSubscription = this.sync.getStream("self.room.list").subscribe(() => {
             this.receivedRoomList = true;
             roomSubscription.unsubscribe(); // we don't care anymore
         });

@@ -25,7 +25,7 @@ export class MatrixRoomService extends AuthenticatedApi {
 
     private static ROOM_CACHE: { [roomId: string]: MatrixRoom } = {};
 
-    private dmRoomMap: DmMap = {users: {}, rooms: {}};
+    private dmRoomMap: DmMap = {users: {}, rooms: {}} = {users: {}, rooms: {}};
 
     constructor(http: HttpClient, auth: MatrixAuthService,
                 private account: MatrixAccountService) {
