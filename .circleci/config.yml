@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/evelium
+    working_directory: /evelium
     docker:
       - image: node:8
     steps:
@@ -16,5 +16,5 @@ jobs:
       - store_artifacts:
           path: build
       - run:
-          name: "Evelium available at:"
+          name: "Evelium available at url:"
           command: INSTANCE_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/build/index.html"; echo $INSTANCE_URL

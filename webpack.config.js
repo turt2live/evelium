@@ -22,7 +22,7 @@ module.exports = function () {
 
     config.output = {
         path: root('build'),
-        publicPath: isProd ? '/' : '/', //http://0.0.0.0:8080',
+        publicPath: isProd ? '' : '/', //http://0.0.0.0:8080',
         filename: isProd ? 'js/[name].[hash].js' : 'js/[name].js',
         chunkFilename: isProd ? '[id].[hash].chunk.js' : '[id].chunk.js',
     };
