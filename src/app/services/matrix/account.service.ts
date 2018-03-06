@@ -18,6 +18,7 @@ export class MatrixAccountService extends AuthenticatedApi {
                 private localStorage: Storage) {
         super(http, auth);
 
+        // TODO: Move account data to indexeddb
         const raw = this.localStorage.getItem("mx.accountData");
         if (raw) {
             const parsed = <AccountDataEvent[]>JSON.parse(raw);
