@@ -14,8 +14,15 @@ export class MatrixAccountService extends AuthenticatedApi {
     private static ACCOUNT_DATA_STREAM = new ReplaySubject<AccountDataEvent>();
 
     constructor(http: HttpClient, auth: MatrixAuthService,
-                private hs: MatrixHomeserverService) {
+                private hs: MatrixHomeserverService,
+                private localStorage: Storage) {
         super(http, auth);
+
+        const raw = this.localStorage.getItem("mx.accountData");
+        if (raw) {
+            const parsed = <AccountDataEvent[]>JSON.parse(raw);
+            parsed.forEach(e => this.setAccountData(e, true, false));
+        }
     }
 
     public getAccountDataStream(): Observable<AccountDataEvent> {
@@ -26,11 +33,11 @@ export class MatrixAccountService extends AuthenticatedApi {
         return <T>MatrixAccountService.ACCOUNT_DATA[eventType];
     }
 
-    public setAccountData(event: AccountDataEvent, cacheOnly = false): Promise<any> {
+    public setAccountData(event: AccountDataEvent, cacheOnly = false, persistCache = true): Promise<any> {
         const oldEvent = this.getAccountData(event.type);
         MatrixAccountService.ACCOUNT_DATA[event.type] = event;
-
         MatrixAccountService.ACCOUNT_DATA_STREAM.next(event);
+        if (persistCache) this.persistAccountData();
         if (cacheOnly) return Promise.resolve(); // Stop here
 
         return this.put(this.hs.buildCsUrl(`user/${this.auth.userId}/account_data/${event.type}`, event.content)).toPromise().then(() => {
@@ -39,7 +46,13 @@ export class MatrixAccountService extends AuthenticatedApi {
             console.error(e);
             MatrixAccountService.ACCOUNT_DATA[event.type] = oldEvent;
             MatrixAccountService.ACCOUNT_DATA_STREAM.next(oldEvent); // Send the reverted event
+            this.persistAccountData();
             return Promise.reject(e); // re-throw
         });
+    }
+
+    private persistAccountData() {
+        const flat = Object.keys(MatrixAccountService.ACCOUNT_DATA).map(type => MatrixAccountService.ACCOUNT_DATA[type]);
+        this.localStorage.setItem("mx.accountData", JSON.stringify(flat));
     }
 }
