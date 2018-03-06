@@ -1,0 +1,28 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      - image: node:8.0
+
+    working_directory: ~/evelium
+
+    steps:
+      - run:
+          name: "Checking Versions"
+          command: |
+            node --version
+            npm --version
+      - checkout
+      - run: npm install
+      #- run: yarn test # TODO
+      - run: npm run lint
+      - run: npm run build
+      - store_artifacts:
+        path: build
+      - run:
+        name: "Evelium available at:"
+        command: INSTANCE_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/build/index.html"; echo $INSTANCE_URL
