@@ -3,8 +3,9 @@ jobs:
   build:
     working_directory: ~/evelium
     docker:
-      - image: node:8.0
+      - image: node:8
     steps:
+      - run: npm install -g npm@5 # upgrade
       - run: node --version
       - run: npm --version
       - checkout
