@@ -4,7 +4,7 @@
 [![TravisCI badge](https://travis-ci.org/turt2live/evelium.svg?branch=master)](https://travis-ci.org/turt2live/evelium)
 [![CircleCI](https://circleci.com/gh/turt2live/evelium.svg?style=svg)](https://circleci.com/gh/turt2live/evelium)
 
-A matrix chat client to facilitate communication amoung communities, organizations, and individuals.
+A matrix chat client to facilitate communication amoung communities, organizations, and individuals. Try it out at [https://evelium.io/app](https://evelium.io/app)
 
 # Currently Alpha
 
