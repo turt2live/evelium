@@ -4,11 +4,13 @@ import "ts-helpers";
 require("zone.js/dist/zone");
 
 //noinspection TypeScriptUnresolvedVariable
-if (process.env.ENV === "build") {
+if (process.env.ENV === "production") {
     // Production
+    console.log("Evelium Production Build");
 
 } else {
     // Development
+    console.log("Evelium Development Build");
 
     Error["stackTraceLimit"] = Infinity;
 

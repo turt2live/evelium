@@ -8,7 +8,7 @@ if (process.env.ENV === "build") {
     enableProdMode();
 }
 
-export function main() {
+export function main(): any {
     return platformBrowserDynamic().bootstrapModule(AppModule);
 }
 
