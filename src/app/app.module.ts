@@ -1,9 +1,8 @@
-import { ApplicationRef, ErrorHandler, Injector, NgModule } from "@angular/core";
+import { ErrorHandler, Injector, NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { AppComponent } from "./app.component";
 import { FormsModule } from "@angular/forms";
 import { routing } from "./app.routing";
-import { createNewHosts, removeNgStyles } from "@angularclass/hmr";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { UiSwitchModule } from "angular2-ui-switch";
 import { ToasterModule } from "angular2-toaster";
@@ -103,25 +102,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
     ]
 })
 export class AppModule {
-    constructor(public appRef: ApplicationRef, injector: Injector) {
+    constructor(injector: Injector) {
         LocatorService.injector = injector;
-    }
-
-    hmrOnInit(store) {
-        console.log("HMR store", store);
-    }
-
-    hmrOnDestroy(store) {
-        let cmpLocation = this.appRef.components.map(cmp => cmp.location.nativeElement);
-        // recreate elements
-        store.disposeOldHosts = createNewHosts(cmpLocation);
-        // remove styles
-        removeNgStyles();
-    }
-
-    hmrAfterDestroy(store) {
-        // display new elements
-        store.disposeOldHosts();
-        delete store.disposeOldHosts;
     }
 }
