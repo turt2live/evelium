@@ -36,7 +36,7 @@ module.exports = function () {
             {
                 test: /\.ts$/,
                 loaders: ['awesome-typescript-loader', 'angular2-template-loader', '@angularclass/hmr-loader'],
-                exclude: [/node_modules\/(?!(ng2-.+))/],
+                exclude: [/node_modules\/(?!(angular2-indexeddb))/],
             },
             {
                 test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
