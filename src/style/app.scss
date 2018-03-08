@@ -1,12 +1,13 @@
 // styles in src/style directory are applied to the whole page
 @import url('https://fonts.googleapis.com/css?family=Barlow+Condensed:100,200,300,400,500,600,700,800,900&subset=latin-ext');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700');
 @import '../../node_modules/angular2-toaster/toaster';
 @import '../../node_modules/perfect-scrollbar/css/perfect-scrollbar';
 @import './vars';
 @import './elements/forms';
 
-* {
-  font-family: 'Barlow Condensed', sans-serif !important;
+html, body {
+  font-family: 'Barlow Condensed', sans-serif;
 }
 
 body {
