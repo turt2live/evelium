@@ -25,9 +25,9 @@ export class RoomListComponent implements OnInit, OnDestroy {
 
     private tagsById: { [id: string]: TaggedRoomList } = {};
 
+    private roomListSubscription: Subscription;
     private newRoomSubscription: Subscription;
     private roomChangedSubscription: Subscription;
-    private paramsSubscription: Subscription;
 
     constructor(private sync: MatrixSyncService) {
     }
@@ -36,19 +36,24 @@ export class RoomListComponent implements OnInit, OnDestroy {
         this.addTag(DIRECT_TAG_ID, "Direct chats", 5);
         this.addTag(ROOMS_TAG_ID, "Rooms", 10);
 
+        this.roomListSubscription = this.sync.getStream<MatrixRoom[]>("self.room.list").subscribe(this.onRoomList.bind(this));
         this.newRoomSubscription = this.sync.getStream<MatrixRoom>("self.room.join").subscribe(this.onNewRoom.bind(this));
         this.roomChangedSubscription = MatrixRoom.UPDATED_STREAM.subscribe(this.onRoomUpdated.bind(this));
     }
 
     public ngOnDestroy() {
+        if (this.roomListSubscription) this.roomListSubscription.unsubscribe();
         if (this.newRoomSubscription) this.newRoomSubscription.unsubscribe();
         if (this.roomChangedSubscription) this.roomChangedSubscription.unsubscribe();
-        if (this.paramsSubscription) this.paramsSubscription.unsubscribe();
     }
 
     private onNewRoom(room: MatrixRoom): void {
         const tag = this.tagsById[room.isDirect ? DIRECT_TAG_ID : ROOMS_TAG_ID];
         tag.rooms.push(room);
+    }
+
+    private onRoomList(rooms: MatrixRoom[]): void {
+        for (const room of rooms) this.onNewRoom(room);
     }
 
     private onRoomUpdated(event: RoomUpdatedEvent): void {

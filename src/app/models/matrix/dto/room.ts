@@ -18,6 +18,8 @@ export interface RoomUpdatedEvent {
 export class MatrixRoom {
     public static readonly UPDATED_STREAM: Observable<RoomUpdatedEvent> = new ReplaySubject<RoomUpdatedEvent>();
 
+    public backfillToken: string;
+
     constructor(private _roomId: string,
                 private _isDirect: boolean,
                 private _state: RoomStateEvent[],
@@ -165,6 +167,11 @@ export class MatrixRoom {
             this.timeline.splice(idx, 1);
             this.publishUpdate("timeline");
         }
+    }
+
+    public addAllToTimeline(events: RoomEvent[]): void {
+        for (const event of events) this.timeline.push(event);
+        this.publishUpdate("timeline");
     }
 
     public addPendingEvent(event: IncompleteRoomEvent): void {

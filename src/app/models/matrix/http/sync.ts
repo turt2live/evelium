@@ -4,11 +4,20 @@ import { PresenceEvent } from "../events/ephemeral/m.presence";
 import { RoomStateEvent } from "../events/room/state/room-state-event";
 import { RoomEvent } from "../events/room/room-event";
 import { EphemeralEvent } from "../events/ephemeral/ephemeral-event";
+import { RoomAccountDataEvent } from "../events/account/room_account/room-account-data-event";
 
 export interface RoomTimeline {
     limited: boolean;
     prev_batch: string;
     events: RoomEvent[];
+}
+
+export interface RoomAccountData {
+    events: RoomAccountDataEvent[];
+}
+
+export interface RoomEphemeralTimeline {
+    events: EphemeralEvent[];
 }
 
 export interface SyncJoinedRooms {
@@ -20,12 +29,8 @@ export interface SyncJoinedRooms {
         state: {
             events: RoomStateEvent[];
         };
-        ephemeral: {
-            events: EphemeralEvent[];
-        };
-        account_data: {
-            events: AccountDataEvent[];
-        };
+        ephemeral: RoomEphemeralTimeline;
+        account_data: RoomAccountData;
         timeline: RoomTimeline;
     };
 }
@@ -61,9 +66,7 @@ export interface SyncResponse {
                     state: {
                         events: RoomStateEvent[];
                     };
-                    account_data: {
-                        events: AccountDataEvent[];
-                    };
+                    account_data: RoomAccountData;
                     timeline: {
                         limited: boolean;
                         prev_batch: string;
