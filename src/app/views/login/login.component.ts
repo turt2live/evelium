@@ -30,7 +30,9 @@ export class LoginComponent {
         }
 
         // TODO: Use a .well-known lookup or similar to resolve this
-        this.hs.csApiUrl = "https://" + this.username.substring(this.username.indexOf(":") + 1) + "/_matrix";
+        if (!this.hs.csApiUrl) {
+            this.hs.csApiUrl = "https://" + this.username.substring(this.username.indexOf(":") + 1) + "/_matrix";
+        }
 
         this.auth.login(this.username, this.password).then(() => {
             this.router.navigate(["/app"]);
