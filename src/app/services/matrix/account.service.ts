@@ -102,11 +102,12 @@ export class MatrixAccountService extends AuthenticatedApi {
             }));
     }
 
-    public async setAccountData(event: AccountDataEvent, cacheOnly = false): Promise<any> {
+    public async setAccountData(event: AccountDataEvent, cacheOnly = false, persistCache = true): Promise<any> {
+        console.log("Updating account data: " + event.type);
         const oldEvent = await this.getAccountData(event.type);
         MatrixAccountService.ACCOUNT_DATA[event.type] = event;
         MatrixAccountService.ACCOUNT_DATA_STREAM.next(event);
-        await this.persistAccountData(event, null);
+        if (persistCache) await this.persistAccountData(event, null);
         if (cacheOnly) return; // stop here
 
         return this.put(this.hs.buildCsUrl(`user/${this.auth.userId}/account_data/${event.type}`, event.content)).toPromise().then(() => {
@@ -119,13 +120,14 @@ export class MatrixAccountService extends AuthenticatedApi {
         });
     }
 
-    public async setRoomAccountData(event: RoomAccountDataEvent, room: MatrixRoom, cacheOnly = false): Promise<any> {
+    public async setRoomAccountData(event: RoomAccountDataEvent, room: MatrixRoom, cacheOnly = false, persistCache = true): Promise<any> {
+        console.log("Updating room account data: " + event.type + " in " + room.id);
         if (!MatrixAccountService.ROOM_ACCOUNT_DATA[room.id]) MatrixAccountService.ROOM_ACCOUNT_DATA[room.id] = {};
 
         const oldEvent = await this.getRoomAccountData(event.type, room);
         MatrixAccountService.ROOM_ACCOUNT_DATA[room.id][event.type] = event;
         MatrixAccountService.ROOM_ACCOUNT_DATA_STREAM.next({event: event, room: room});
-        await this.persistAccountData(event, room.id);
+        if (persistCache) await this.persistAccountData(event, room.id);
         if (cacheOnly) return; // stop here
 
         return this.put(this.hs.buildCsUrl(`user/${this.auth.userId}/rooms/${room.id}/account_data/${event.type}`, event.content)).toPromise().then(() => {

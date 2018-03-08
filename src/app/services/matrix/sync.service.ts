@@ -99,7 +99,8 @@ export class MatrixSyncService extends AuthenticatedApi {
             .then(rooms => this.getBroadcastStream("self.room.list").next(rooms))
             .then(() => this.getBatches())
             .then(batches => batches.forEach(b => this.processBatch(b)))
-            .then(() => this.cacheAccountData());
+            .then(() => this.cacheAccountData())
+            .then(() => console.log("Finished loading sync data from db"));
     }
 
     private getStoredRooms(): Promise<PersistedRoomState[]> {
@@ -172,7 +173,7 @@ export class MatrixSyncService extends AuthenticatedApi {
     }
 
     private processBatch(batch: PersistedEventBatch): Promise<any> {
-        //console.log("Processing batch: " + batch.id);
+        console.log("Processing batch: " + batch.id);
 
         const room = this.rooms.getRoom(batch.roomId);
         if (!room) {
@@ -188,9 +189,9 @@ export class MatrixSyncService extends AuthenticatedApi {
 
     private cacheAccountData(): Promise<any> {
         return this.account.getStoredAccountData()
-            .then(events => Promise.all(events.map(e => this.account.setAccountData(e, true))))
+            .then(events => Promise.all(events.map(e => this.account.setAccountData(e, true, false))))
             .then(() => this.account.getStoredRoomAccountData())
-            .then(events => Promise.all(events.map(e => this.account.setRoomAccountData(e.event, this.rooms.getRoom(e.roomId), true))));
+            .then(events => Promise.all(events.map(e => this.account.setRoomAccountData(e.event, this.rooms.getRoom(e.roomId), true, false))));
     }
 
     private loopSyncing() {
