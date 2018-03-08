@@ -10,12 +10,18 @@ import { RoomAvatarEvent } from "../events/room/state/m.room.avatar";
 import { RoomTopicEvent } from "../events/room/state/m.room.topic";
 import { IncompleteRoomEvent, RoomEvent } from "../events/room/room-event";
 
+const MAX_TIMELINE_MEMORY_LENGTH = 150;
+
 export interface RoomUpdatedEvent {
     room: MatrixRoom;
     property: string;
 }
 
 export class MatrixRoom {
+
+    // TODO: Replace this 'stream' with something else.
+    // This feels like a hack and just makes this entire class incredibly complicated.
+    // It's worse when considering the only thing we're listening to is "is there a new event?" to scroll down automatically.
     public static readonly UPDATED_STREAM: Observable<RoomUpdatedEvent> = new ReplaySubject<RoomUpdatedEvent>();
 
     public backfillToken: string;
@@ -158,6 +164,7 @@ export class MatrixRoom {
 
     public addTimelineEvent(event: RoomEvent): void {
         this.timeline.push(event);
+        this.checkTimelineLength();
         this.publishUpdate("timeline");
     }
 
@@ -171,7 +178,17 @@ export class MatrixRoom {
 
     public addAllToTimeline(events: RoomEvent[]): void {
         for (const event of events) this.timeline.push(event);
+        this.checkTimelineLength();
         this.publishUpdate("timeline");
+    }
+
+    private checkTimelineLength(): void {
+        if (this.timeline.length > MAX_TIMELINE_MEMORY_LENGTH) {
+            const excess = this.timeline.length - MAX_TIMELINE_MEMORY_LENGTH;
+            console.log(`Trimming ${excess} events from ${this.id}`);
+
+            this.timeline.splice(0, excess);
+        }
     }
 
     public addPendingEvent(event: IncompleteRoomEvent): void {
