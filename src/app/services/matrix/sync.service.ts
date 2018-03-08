@@ -3,7 +3,10 @@ import { HttpClient } from "@angular/common/http";
 import { MatrixHomeserverService } from "./homeserver.service";
 import { AuthenticatedApi } from "./authenticated-api";
 import { MatrixAuthService } from "./auth.service";
-import { RoomTimeline, SyncJoinedRooms, SyncResponse } from "../../models/matrix/http/sync";
+import {
+    RoomAccountData, RoomEphemeralTimeline, RoomTimeline, SyncJoinedRooms,
+    SyncResponse
+} from "../../models/matrix/http/sync";
 import { Observable } from "rxjs/Observable";
 import { MatrixRoom } from "../../models/matrix/dto/room";
 import { MatrixRoomService } from "./room.service";
@@ -42,8 +45,8 @@ export class MatrixSyncService extends AuthenticatedApi {
     private initDb(): Promise<any> {
         if (this.db) return Promise.resolve();
 
-        this.db = new AngularIndexedDB("evelium.sync", 1);
-        return this.db.openDatabase(1, evt => {
+        const db = new AngularIndexedDB("evelium.sync", 1);
+        return db.openDatabase(1, evt => {
             const batches = evt.currentTarget.result.createObjectStore("batches", {
                 keyPath: "id",
                 autoIncrement: true,
@@ -59,7 +62,15 @@ export class MatrixSyncService extends AuthenticatedApi {
             });
             roomState.createIndex("roomId", "roomId", {unique: true});
             roomState.createIndex("events", "events", {unique: false});
-        });
+
+            const eduStore = evt.currentTarget.result.createObjectStore("room_edus", {
+                keyPath: "id",
+                autoIncrement: true,
+            });
+            eduStore.createIndex("roomId", "roomId", {unique: false});
+            eduStore.createIndex("eventType", "eventType", {unique: false});
+            eduStore.createIndex("content", "content", {unique: false});
+        }).then(() => this.db = db);
     }
 
     public getStream<T>(event: string): Observable<T> {
@@ -233,12 +244,49 @@ export class MatrixSyncService extends AuthenticatedApi {
                     .then(() => this.getBroadcastStream("self.room.join").next(existingRoom));
             }
 
-            return this.processTimeline(existingRoom, room.timeline, startToken, endToken);
+            const promises: Promise<any>[] = [
+                // Each of these should no-op if the root key doesn't exist or is invalid
+                this.processRoomAccountData(room.account_data, existingRoom),
+                this.processRoomEdus(room.ephemeral, existingRoom),
+                this.processTimeline(existingRoom, room.timeline, startToken, endToken),
+            ];
+
+            return <Promise<any>>Promise.all(promises);
         }));
     }
 
+    private processRoomEdus(ephemeralTimeline: RoomEphemeralTimeline, room: MatrixRoom): Promise<any> {
+        if (!ephemeralTimeline || !ephemeralTimeline.events) return Promise.resolve();
+
+        // TODO: Raise 'new ephemeral event' events somewhere
+        const filteredEvents = ephemeralTimeline.events.filter(e => e.type !== "m.typing");
+        return this.initDb().then(() => Promise.all(filteredEvents.map(e => {
+            return this.db.getByKey("room_edus", {roomId: room.id, eventType: e.type})
+                .then(record => {
+                    // Exists: update
+                    return this.db.update("room_edus", {
+                        roomId: room.id,
+                        eventType: e.type,
+                        content: e.content
+                    }, record.id);
+                }, () => {
+                    // Doesn't exist, create
+                    return this.db.add("room_edus", {
+                        roomId: room.id,
+                        eventType: e.type,
+                        content: e.content,
+                    });
+                });
+        })));
+    }
+
+    private processRoomAccountData(accountData: RoomAccountData, room: MatrixRoom): Promise<any> {
+        if (!accountData || !accountData.events) return Promise.resolve();
+        return Promise.all(accountData.events.map(event => this.account.setRoomAccountData(event, room, true)));
+    }
+
     private processTimeline(room: MatrixRoom, timeline: RoomTimeline, startToken: string, endToken: string): Promise<any> {
-        if (!timeline.events) return;
+        if (!timeline || !timeline.events) return Promise.resolve();
 
         const diff = this.addEventsToRoom(room, timeline.events);
 
