@@ -12,7 +12,7 @@ jobs:
       - run: npm install
       #- run: npm run test # TODO
       - run: npm run lint
-      - run: npm run build
+      - run: npm run build:ci
       - store_artifacts:
           path: build
       - run:
