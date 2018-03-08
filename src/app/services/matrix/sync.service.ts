@@ -154,12 +154,13 @@ export class MatrixSyncService extends AuthenticatedApi {
 
                 let freedEvents = 0;
                 const toDelete = [];
-                const batchIds = Object.keys(this.batchSizeMap[roomId]).sort();
+                const batchIds = Object.keys(this.batchSizeMap[roomId]).map(i => Number(i)).sort();
                 for (const batchId of batchIds) {
                     const ifDeletedCount = storedEvents - freedEvents - this.batchSizeMap[roomId][batchId];
                     if (ifDeletedCount >= MAX_PERSISTED_TIMELINE_EVENTS) {
                         freedEvents += this.batchSizeMap[roomId][batchId];
-                        toDelete.push(Number(batchId));
+                        toDelete.push(batchId);
+                        delete this.batchSizeMap[roomId][batchId];
                     } else break;
                 }
 
