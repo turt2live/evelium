@@ -86,6 +86,22 @@ export class MatrixAccountService extends AuthenticatedApi {
             .catch(() => Promise.resolve(null)); // intentionally ignore errors
     }
 
+    public getStoredAccountData(): Promise<AccountDataEvent[]> {
+        return this.initDb()
+            .then(() => this.db.getAll("account_data"))
+            .then(records => records.filter(r => !r.roomId).map(r => {
+                return {type: r.eventType, content: r.content};
+            }));
+    }
+
+    public getStoredRoomAccountData(): Promise<{ roomId: string, event: RoomAccountDataEvent }[]> {
+        return this.initDb()
+            .then(() => this.db.getAll("account_data"))
+            .then(records => records.filter(r => r.roomId).map(r => {
+                return {roomId: r.roomId, event: {type: r.eventType, content: r.content}};
+            }));
+    }
+
     public async setAccountData(event: AccountDataEvent, cacheOnly = false): Promise<any> {
         const oldEvent = await this.getAccountData(event.type);
         MatrixAccountService.ACCOUNT_DATA[event.type] = event;

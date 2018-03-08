@@ -98,7 +98,8 @@ export class MatrixSyncService extends AuthenticatedApi {
             .then(rooms => rooms.map(r => this.rooms.cacheRoomFromState(r.roomId, r.events)))
             .then(rooms => this.getBroadcastStream("self.room.list").next(rooms))
             .then(() => this.getBatches())
-            .then(batches => batches.forEach(b => this.processBatch(b)));
+            .then(batches => batches.forEach(b => this.processBatch(b)))
+            .then(() => this.cacheAccountData());
     }
 
     private getStoredRooms(): Promise<PersistedRoomState[]> {
@@ -183,6 +184,13 @@ export class MatrixSyncService extends AuthenticatedApi {
         this.addEventsToRoom(room, batch.events);
 
         return Promise.resolve();
+    }
+
+    private cacheAccountData(): Promise<any> {
+        return this.account.getStoredAccountData()
+            .then(events => Promise.all(events.map(e => this.account.setAccountData(e, true))))
+            .then(() => this.account.getStoredRoomAccountData())
+            .then(events => Promise.all(events.map(e => this.account.setRoomAccountData(e.event, this.rooms.getRoom(e.roomId), true))));
     }
 
     private loopSyncing() {
