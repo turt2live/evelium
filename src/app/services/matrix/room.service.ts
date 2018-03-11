@@ -93,9 +93,9 @@ class RoomHandler {
     constructor(http: HttpClient, auth: AuthService, sync: SyncService, account: AccountService, private hs: HomeserverService) {
         this.api = new AuthenticatedApiAccess(http, auth);
 
-        const observable = new Subject<Room>();
-        this.joined = observable;
-        this.joinedOut = observable;
+        const joinedObservable = new Subject<Room>();
+        this.joined = joinedObservable;
+        this.joinedOut = joinedObservable;
 
         this.dbPromise = this.loadFromDb().then(() => console.log("Loaded room information from database"));
 
@@ -108,7 +108,7 @@ class RoomHandler {
 
     private async processSync(response: SyncResponse): Promise<any> {
         if (!response || !response.rooms || !response.rooms.join) return;
-        console.log("Processing sync response");
+        console.log("Processing joined rooms from sync response");
         await this.dbPromise;
 
         for (const roomId in response.rooms.join) {
@@ -174,8 +174,6 @@ class RoomHandler {
     }
 
     private async prepareRoom(roomId: string, state: RoomStateEvent[]): Promise<CachedRoom> {
-        await this.dbPromise;
-
         const room = new Room(roomId, state);
 
         const pendingTimeline = new ReplaySubject<RoomEvent[]>(1);
@@ -197,7 +195,6 @@ class RoomHandler {
         };
         this.cache[roomId] = cachedRoom;
 
-        await this.addEventsToRoom(room, state);
         return Promise.resolve(cachedRoom);
     }
 
@@ -338,15 +335,16 @@ class RoomHandler {
         }).then(() => {
             return this.db.getAll("rooms");
         }).then(records => {
-            // TODO: There's a bit of a race here where we prepare the room by blocking on this promise...
-            return records.forEach(r => this.prepareRoom(r.roomId, r.events));
+            return Promise.all(records.map(r => {
+                return this.prepareRoom(r.roomId, r.state).then(room => this.joinedOut.next(room.obj));
+            }));
         }).then(() => {
             return this.db.getAll("batches");
         }).then(records => {
-            return records.forEach(r => {
+            return Promise.all(records.map(r => {
                 const room = this.cache[r.roomId];
                 return this.addEventsToRoom(room.obj, r.events);
-            });
+            }));
         }).then(() => {
             // TODO: Load EDUs
             // TODO: Load Room Account Data
