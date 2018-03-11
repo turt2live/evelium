@@ -45,6 +45,7 @@ export class RoomComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     public ngOnChanges() {
+        this.timeline = [];
         if (this.roomSubscription) this.roomSubscription.unsubscribe();
         if (this.room) this.roomSubscription = this.room.timeline.subscribe(this.onTimelineEvent.bind(this));
     }
