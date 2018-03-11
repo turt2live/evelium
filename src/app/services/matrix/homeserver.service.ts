@@ -1,42 +1,42 @@
 import { Injectable } from "@angular/core";
 
+/**
+ * Service for holding various pieces of information about a connected matrix homeserver.
+ */
 @Injectable()
-export class MatrixHomeserverService {
-
+export class HomeserverService {
     constructor(private localStorage: Storage) {
     }
 
-    public get csApiUrl(): string {
-        return this.localStorage.getItem("mx.csApiUrl");
+    /**
+     * Determines if the generic API URL is available for use.
+     * @returns {boolean} True if the generic API URL is available, false otherwise.
+     */
+    public get isApiUrlSet(): boolean {
+        return !!this.localStorage.getItem("mx.csApiUrl");
     }
 
-    public set csApiUrl(newUrl: string) {
-        this.localStorage.setItem("mx.csApiUrl", newUrl);
+    /**
+     * Sets the generic API URL for accessing the client/server API as well as the Content Repository.
+     * @param {string} url The base URL to set.
+     */
+    public set apiUrl(url: string) {
+        this.localStorage.setItem("mx.csApiUrl", url);
     }
 
-    public get mediaApiUrl(): string {
-        // The media API is technically under the same place as the CS API
-        return this.localStorage.getItem("mx.csApiUrl");
+    /**
+     * Gets the base URL for the client/server API.
+     * @returns {string} The base URL for the client/server API.
+     */
+    public get clientServerApi(): string {
+        return this.localStorage.getItem("mx.csApiUrl") + "/client/r0";
     }
 
-    public set mediaApiUrl(newUrl: string) {
-        // The media API is technically under the same place as the CS API
-        this.localStorage.setItem("mx.csApiUrl", newUrl);
-    }
-
-    public buildMediaUrl(action: string, version = "r0"): string {
-        let baseUrl = this.mediaApiUrl;
-        if (baseUrl.endsWith("/")) baseUrl = baseUrl.substring(0, baseUrl.length - 1);
-        if (action.startsWith("/")) action = action.substring(1);
-
-        return `${baseUrl}/media/${version}/${action}`;
-    }
-
-    public buildCsUrl(action: string, version = "r0"): string {
-        let baseUrl = this.csApiUrl;
-        if (baseUrl.endsWith("/")) baseUrl = baseUrl.substring(0, baseUrl.length - 1);
-        if (action.startsWith("/")) action = action.substring(1);
-
-        return `${baseUrl}/client/${version}/${action}`;
+    /**
+     * Gets the base URL for the client/server Content Repository API.
+     * @returns {string} The base URL for the content repository API.
+     */
+    public get mediaApi(): string {
+        return this.localStorage.getItem("mx.csApiUrl") + "/media/r0";
     }
 }

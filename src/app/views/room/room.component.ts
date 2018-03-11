@@ -1,18 +1,21 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { MatrixRoom, RoomUpdatedEvent } from "../../models/matrix/dto/room";
+import { Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { Subscription } from "rxjs/Subscription";
 import { PerfectScrollbarDirective } from "ngx-perfect-scrollbar";
+import { Room } from "../../models/matrix/dto/room";
+import { RoomEvent } from "../../models/matrix/events/room/room-event";
 
 @Component({
     selector: "my-room",
     templateUrl: "./room.component.html",
     styleUrls: ["./room.component.scss"]
 })
-export class RoomComponent implements OnInit, OnDestroy {
+export class RoomComponent implements OnInit, OnDestroy, OnChanges {
 
     @ViewChild(PerfectScrollbarDirective) public timelineScrollDirective: PerfectScrollbarDirective;
 
-    @Input() public room: MatrixRoom;
+    @Input() public room: Room;
+
+    public timeline: RoomEvent[] = [];
 
     private roomSubscription: Subscription;
 
@@ -20,16 +23,20 @@ export class RoomComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit() {
-        this.roomSubscription = MatrixRoom.UPDATED_STREAM.subscribe(this.onRoomUpdated.bind(this));
+        if (this.room) this.roomSubscription = this.room.timeline.subscribe(this.onTimelineEvent.bind(this));
+    }
+
+    public ngOnChanges() {
+        if (this.roomSubscription) this.roomSubscription.unsubscribe();
+        if (this.room) this.roomSubscription = this.room.timeline.subscribe(this.onTimelineEvent.bind(this));
     }
 
     public ngOnDestroy() {
         if (this.roomSubscription) this.roomSubscription.unsubscribe();
     }
 
-    private onRoomUpdated(event: RoomUpdatedEvent): void {
-        if (!this.room || event.room.id !== this.room.id) return;
-        if (event.property !== "timeline" && event.property !== "pendingEvents") return;
+    private onTimelineEvent(event: RoomEvent): void {
+        this.timeline.push(event);
         if (this.timelineScrollDirective) this.timelineScrollDirective.scrollToBottom();
     }
 }

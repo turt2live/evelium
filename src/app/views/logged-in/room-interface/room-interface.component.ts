@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { MatrixRoomService } from "../../../services/matrix/room.service";
-import { MatrixRoom } from "../../../models/matrix/dto/room";
 import { Subscription } from "rxjs/Subscription";
+import { Room } from "../../../models/matrix/dto/room";
+import { RoomService } from "../../../services/matrix/room.service";
 
 @Component({
     templateUrl: "./room-interface.component.html",
@@ -10,16 +10,17 @@ import { Subscription } from "rxjs/Subscription";
 })
 export class RoomInterfaceComponent implements OnInit, OnDestroy {
 
-    public activeRoom: MatrixRoom;
+    public activeRoom: Room;
 
     private paramsSubscription: Subscription;
 
-    constructor(private activeRoute: ActivatedRoute, private rooms: MatrixRoomService) {
+    constructor(private activeRoute: ActivatedRoute, private rooms: RoomService) {
     }
 
     public ngOnInit() {
         this.paramsSubscription = this.activeRoute.params.subscribe(params => {
-            this.activeRoom = this.rooms.getRoom((params || {})['roomId']);
+            // TODO: Handle case of room not found
+            this.rooms.getById((params || {})['roomId']).then(r => this.activeRoom = r);
         });
     }
 

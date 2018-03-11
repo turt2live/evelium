@@ -1,44 +1,42 @@
 import { Component, OnInit } from "@angular/core";
 import "../style/app.scss";
-import { WhoAmIResponse } from "./models/matrix/http/whoami";
-import { AuthenticatedApi } from "./services/matrix/authenticated-api";
-import { MatrixAuthService } from "./services/matrix/auth.service";
-import { HttpClient } from "@angular/common/http";
-import { MatrixHomeserverService } from "./services/matrix/homeserver.service";
 import { Router } from "@angular/router";
+import { AuthService } from "./services/matrix/auth.service";
+import { AccountService } from "./services/matrix/account.service";
+import { HomeserverService } from "./services/matrix/homeserver.service";
 
 @Component({
     selector: "my-app", // <my-app></my-app>
     templateUrl: "./app.component.html",
     styleUrls: ["./app.component.scss"],
 })
-export class AppComponent extends AuthenticatedApi implements OnInit {
+export class AppComponent implements OnInit {
 
-    constructor(http: HttpClient, auth: MatrixAuthService,
-                private router: Router,
-                private hs: MatrixHomeserverService) {
-        super(http, auth);
+    constructor(private auth: AuthService, private router: Router, private account: AccountService, private hs: HomeserverService) {
     }
 
-    public ngOnInit() {
-        return this.validateToken();
+    public async ngOnInit() {
+        await this.validateToken();
     }
 
     public validateToken(): Promise<any> {
         const loginRoute = ["/login"];
 
-        if (!this.hs.csApiUrl) {
+        if (!this.hs.isApiUrlSet) {
+            console.log("Redirecting to login: Missing API URL");
             return this.router.navigate(loginRoute);
-        } else console.log("csApiUrl is " + this.hs.csApiUrl);
+        } else console.log("csApiUrl is " + this.hs.clientServerApi);
 
         if (!this.auth.accessToken || !this.auth.isLoggedIn()) {
+            console.log("Redirecting to login: Missing access token");
             return this.router.navigate(loginRoute);
         } else console.log("accessToken is set");
 
-        return this.get<WhoAmIResponse>(this.hs.buildCsUrl(`/account/whoami`)).toPromise().then(r => {
-            console.log("Token belongs to " + r.user_id);
+        return this.account.whoAmI().then(userId => {
+            console.log("I am " + userId);
         }).catch(e => {
             console.error(e);
+            console.log("Redirecting to login: Error checking whoami");
             return this.router.navigate(loginRoute);
         });
     }

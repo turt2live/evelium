@@ -2,11 +2,11 @@ import {
     Component, ComponentFactoryResolver, ComponentRef, Input, OnDestroy, OnInit, Type, ViewChild,
     ViewContainerRef
 } from "@angular/core";
-import { MatrixRoom } from "../../models/matrix/dto/room";
 import { MessageEventTileComponent } from "./message/message.component";
 import { RoomEvent } from "../../models/matrix/events/room/room-event";
 import { MemberEventTileComponent } from "./member/member.component";
 import { EventTileComponentBase } from "./event-tile.component.base";
+import { Room } from "../../models/matrix/dto/room";
 
 interface TileMap {
     [eventType: string]: Type<EventTileComponentBase>;
@@ -24,7 +24,7 @@ export class EventTileComponent implements OnInit, OnDestroy {
     @ViewChild('wrapper', {read: ViewContainerRef}) public wrapper: ViewContainerRef;
 
     @Input() public event: RoomEvent;
-    @Input() public room: MatrixRoom;
+    @Input() public room: Room;
 
     private componentRef: ComponentRef<EventTileComponentBase>;
 
@@ -71,8 +71,9 @@ export class EventTileComponent implements OnInit, OnDestroy {
     }
 
     public get previousEvent(): RoomEvent {
-        const idx = this.room.timeline.indexOf(this.event);
-        if (idx > 0) return this.room.timeline[idx - 1];
+        // TODO: Handle getting the previous event
+        // const idx = this.room.timeline.indexOf(this.event);
+        // if (idx > 0) return this.room.timeline[idx - 1];
         return null;
     }
 }

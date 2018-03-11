@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
-import { MatrixSyncService } from "../../services/matrix/sync.service";
-import { MatrixRoomService } from "../../services/matrix/room.service";
+import { SyncService } from "../../services/matrix/sync.service";
+import { RoomService } from "../../services/matrix/room.service";
 
 @Component({
     templateUrl: "./logged-in.component.html",
@@ -10,12 +10,12 @@ export class LoggedInComponent implements OnInit {
 
     public receivedRoomList = false;
 
-    constructor(private sync: MatrixSyncService, public rooms: MatrixRoomService) {
+    constructor(private sync: SyncService, private rooms: RoomService) {
     }
 
     public ngOnInit() {
         this.sync.startSyncing();
-        const roomSubscription = this.sync.getStream("self.room.list").subscribe(() => {
+        const roomSubscription = this.rooms.joined.subscribe(() => {
             this.receivedRoomList = true;
             roomSubscription.unsubscribe(); // we don't care anymore
         });

@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { MatrixRoomService } from "../../../services/matrix/room.service";
-import { MatrixSyncService } from "../../../services/matrix/sync.service";
+import { RoomService } from "../../../services/matrix/room.service";
 
 @Component({
     templateUrl: "./homepage.component.html",
@@ -9,17 +8,16 @@ import { MatrixSyncService } from "../../../services/matrix/sync.service";
 })
 export class HomepageComponent implements OnInit {
 
-    constructor(private router: Router, private sync: MatrixSyncService, private rooms: MatrixRoomService) {
+    constructor(private router: Router, private rooms: RoomService) {
     }
 
     public ngOnInit() {
         let navigated = false;
-        const roomsSubscription = this.sync.getStream("self.room.join").subscribe(() => {
+        const roomsSubscription = this.rooms.joined.subscribe(() => {
             if (navigated) return;
 
             navigated = true;
-            const room = this.rooms.getAllRooms()[0];
-            this.router.navigate(['app', 'rooms', room.id]);
+            this.rooms.getAll().then(rooms => this.router.navigate(['app', 'rooms', rooms[0].roomId]));
 
             if (roomsSubscription) roomsSubscription.unsubscribe();
         });

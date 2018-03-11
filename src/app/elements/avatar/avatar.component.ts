@@ -1,5 +1,5 @@
 import { Input } from "@angular/core";
-import { MatrixMediaService } from "../../services/matrix/media.service";
+import { MediaService } from "../../services/matrix/media.service";
 
 export class AvatarComponent {
 
@@ -9,7 +9,7 @@ export class AvatarComponent {
 
     public showPlaceholder = true;
 
-    constructor(protected media: MatrixMediaService) {
+    constructor(protected media: MediaService) {
     }
 
     public get style(): any {
@@ -32,7 +32,7 @@ export class AvatarComponent {
     public get hasUrl(): boolean {
         const mxc = this.mxcUrl;
         if (!mxc) return false;
-        return MatrixMediaService.isValidMxc(mxc);
+        return MediaService.isValidMxc(mxc);
     }
 
     public get avatarUrl(): string {

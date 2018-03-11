@@ -6,7 +6,7 @@
     <div class="timeline ps" [perfectScrollbar]="">
         <div class="events">
             <my-event-tile class="event-tile"
-                           *ngFor="let event of room.timeline"
+                           *ngFor="let event of timeline"
                            [event]="event"
                            [room]="room"
             ></my-event-tile>

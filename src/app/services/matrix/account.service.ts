@@ -1,162 +1,162 @@
 import { Injectable } from "@angular/core";
+import { AuthenticatedApi, AuthenticatedApiAccess } from "./authenticated-api";
 import { HttpClient } from "@angular/common/http";
-import { MatrixHomeserverService } from "./homeserver.service";
-import { AuthenticatedApi } from "./authenticated-api";
-import { MatrixAuthService } from "./auth.service";
+import { AuthService } from "./auth.service";
+import { Subject } from "rxjs/Subject";
 import { AccountDataEvent } from "../../models/matrix/events/account/account-data-event";
-import { ReplaySubject } from "rxjs/ReplaySubject";
-import { Observable } from "rxjs/Observable";
+import { HomeserverService } from "./homeserver.service";
 import { AngularIndexedDB } from "angular2-indexeddb/angular2-indexeddb";
-import { RoomAccountDataEvent } from "../../models/matrix/events/account/room_account/room-account-data-event";
-import { MatrixRoom } from "../../models/matrix/dto/room";
+import { WhoAmIResponse } from "../../models/matrix/http/whoami";
+import { SyncService } from "./sync.service";
+import { ACCOUNT_DATA_DB } from "./databases";
+import { SyncResponse } from "../../models/matrix/http/sync";
 
-export interface RoomAccountDataUpdatedEvent {
-    event: RoomAccountDataEvent;
-    room: MatrixRoom;
-}
+// For singleton access
+let accountData: AccountDataHandler;
 
+/**
+ * Service for account-related functions, such as changing passwords and account data.
+ */
 @Injectable()
-export class MatrixAccountService extends AuthenticatedApi {
+export class AccountService extends AuthenticatedApi {
 
-    private static ACCOUNT_DATA: { [eventType: string]: AccountDataEvent } = {};
-    private static ACCOUNT_DATA_STREAM = new ReplaySubject<AccountDataEvent>();
-    private static ROOM_ACCOUNT_DATA: { [roomId: string]: { [eventType: string]: RoomAccountDataEvent } } = {};
-    private static ROOM_ACCOUNT_DATA_STREAM = new ReplaySubject<RoomAccountDataUpdatedEvent>();
-
-    private db: AngularIndexedDB;
-
-    constructor(http: HttpClient, auth: MatrixAuthService,
-                private hs: MatrixHomeserverService) {
+    constructor(http: HttpClient, auth: AuthService, private hs: HomeserverService, private sync: SyncService) {
         super(http, auth);
     }
 
     /**
-     * Initializes the internal database for account data. No-ops if the database has already been set up
-     * @returns {Promise<any>} Resolves when the database is ready.
+     * The account data for the currently logged-in user
+     * @returns {AccountDataHandler} The account data.
      */
-    private initDb(): Promise<any> {
-        if (this.db) return Promise.resolve();
-
-        const db = new AngularIndexedDB("evelium.account_data", 1);
-        return db.openDatabase(1, evt => {
-            const batches = evt.currentTarget.result.createObjectStore("account_data", {
-                keyPath: "id",
-                autoIncrement: true,
-            });
-            batches.createIndex("roomId", "roomId", {unique: false}); // nullable
-            batches.createIndex("eventType", "eventType", {unique: false});
-            batches.createIndex("content", "content", {unique: false});
-        }).then(() => this.db = db);
-    }
-
-    public getAccountDataStream(): Observable<AccountDataEvent> {
-        return MatrixAccountService.ACCOUNT_DATA_STREAM;
-    }
-
-    public getRoomAccountDataStream(): Observable<RoomAccountDataUpdatedEvent> {
-        return MatrixAccountService.ROOM_ACCOUNT_DATA_STREAM;
+    public get accountData(): AccountDataHandler {
+        if (!accountData) accountData = new AccountDataHandler(this.http, this.auth, this.hs, this.sync);
+        return accountData;
     }
 
     /**
-     * Gets account data from the underlying store. If the event requested does not exist then null will be returned.
-     * @param {string} eventType The event type to look up
-     * @returns {Promise<T extends AccountDataEvent|AccountDataEvent>} Resolves to the requested account data, or null if not found
+     * Determines who the current logged in user is. This value is not cached and relies on the homeserver
+     * returning information about the user.
+     * @returns {Promise<string>} Resolves to the user ID who is currently logged in.
      */
-    public getAccountData<T extends AccountDataEvent | AccountDataEvent>(eventType: string): Promise<T | AccountDataEvent> {
-        return this.lookupAccountData(eventType, null);
+    public whoAmI(): Promise<string> {
+        return this.get<WhoAmIResponse>(`${this.hs.clientServerApi}/account/whoami`).toPromise().then(r => r.user_id);
+    }
+}
+
+/**
+ * Handles account data processing on behalf of the client. There should only be one
+ * instance of this class in the wild.
+ */
+class AccountDataHandler {
+
+    /**
+     * An observable way to access account data. Supplying values to the subject will result
+     * in them being set.
+     */
+    public readonly events: Subject<AccountDataEvent>;
+    private eventsOut: Subject<AccountDataEvent>;
+
+    private api: AuthenticatedApiAccess;
+    private cache: { [eventType: string]: AccountDataEvent } = {};
+    private db: AngularIndexedDB;
+    private dbPromise: Promise<any>;
+
+    constructor(http: HttpClient, private auth: AuthService, private hs: HomeserverService, sync: SyncService) {
+        this.api = new AuthenticatedApiAccess(http, auth);
+
+        const observable = new Subject<AccountDataEvent>();
+        const observer = {
+            next: (data: AccountDataEvent) => {
+                return this.set(data.type, data.content);
+            },
+        };
+        this.eventsOut = observable;
+        this.events = Subject.create(observer, observable);
+        this.dbPromise = this.loadFromDb().then(() => console.log("Loaded account data information from database"));
+
+        sync.stream.subscribe(response => this.processSync(response));
+    }
+
+    private async processSync(response: SyncResponse): Promise<any> {
+        if (!response || !response.account_data || !response.account_data.events) return;
+
+        console.log("Processing account data from sync response");
+        await this.dbPromise;
+        response.account_data.events.forEach(e => {
+            this.cache[e.type] = e;
+            this.eventsOut.next(e);
+            return this.upsert(e);
+        });
     }
 
     /**
-     * Gets account data from the underlying store for a given room. If the event requested does not exist then null will be returned.
-     * @param {string} eventType The event type to look up
-     * @param {MatrixRoom} room The room to get account data for
-     * @returns {Promise<T extends RoomAccountDataEvent|RoomAccountDataEvent>} Resolves to the requested account data, or null if not found
+     * Gets the account data for the given event type. If the event is not found, null is returned.
+     * @param {string} eventType The event type to look up.
+     * @returns {Promise<AccountDataEvent>} Resolves to the found account data, or null if not found.
      */
-    public getRoomAccountData<T extends RoomAccountDataEvent | RoomAccountDataEvent>(eventType: string, room: MatrixRoom): Promise<T | RoomAccountDataEvent> {
-        return this.lookupAccountData(eventType, room.id).then(e => <RoomAccountDataEvent>e);
+    public async get(eventType: string): Promise<AccountDataEvent> {
+        await this.dbPromise;
+        if (!this.cache[eventType]) return Promise.resolve(null);
+        return Promise.resolve(this.cache[eventType]);
     }
 
-    private lookupAccountData(eventType: string, roomId: string): Promise<AccountDataEvent> {
-        const store = roomId ? MatrixAccountService.ROOM_ACCOUNT_DATA[roomId] : MatrixAccountService.ACCOUNT_DATA;
-        if (store && store[eventType]) return Promise.resolve(store[eventType]);
+    /**
+     * Sets account data on the user's account. To delete account data, set the content to an empty
+     * object or null. This will cause an immediate change which may be reverted if something goes wrong.
+     * @param {string} eventType The event type to set.
+     * @param {*} content The content to set, or an empty object to mark the event deleted.
+     * @returns {Promise<any>} Resolves when the account data has been set.
+     */
+    public async set(eventType: string, content: any): Promise<any> {
+        await this.dbPromise;
+        if (content === null) content = {};
 
-        return this.initDb()
-            .then(() => this.db.getByKey("account_data", {eventType: eventType, roomId: roomId}))
-            .then(record => <AccountDataEvent>{type: record.eventType, content: record.content})
-            .catch(() => Promise.resolve(null)); // intentionally ignore errors
-    }
+        const old = await this.get(eventType);
+        const newEvent: AccountDataEvent = {type: eventType, content: content};
 
-    public getStoredAccountData(): Promise<AccountDataEvent[]> {
-        return this.initDb()
-            .then(() => this.db.getAll("account_data"))
-            .then(records => records.filter(r => !r.roomId).map(r => {
-                return {type: r.eventType, content: r.content};
-            }));
-    }
-
-    public getStoredRoomAccountData(): Promise<{ roomId: string, event: RoomAccountDataEvent }[]> {
-        return this.initDb()
-            .then(() => this.db.getAll("account_data"))
-            .then(records => records.filter(r => r.roomId).map(r => {
-                return {roomId: r.roomId, event: {type: r.eventType, content: r.content}};
-            }));
-    }
-
-    public async setAccountData(event: AccountDataEvent, cacheOnly = false, persistCache = true): Promise<any> {
-        console.log("Updating account data: " + event.type);
-        const oldEvent = await this.getAccountData(event.type);
-        MatrixAccountService.ACCOUNT_DATA[event.type] = event;
-        MatrixAccountService.ACCOUNT_DATA_STREAM.next(event);
-        if (persistCache) await this.persistAccountData(event, null);
-        if (cacheOnly) return; // stop here
-
-        return this.put(this.hs.buildCsUrl(`user/${this.auth.userId}/account_data/${event.type}`, event.content)).toPromise().then(() => {
-            console.log("Successfully saved account data: " + event.type);
+        this.cache[eventType] = newEvent;
+        this.eventsOut.next(newEvent);
+        return this.api.put(`${this.hs.clientServerApi}/user/${this.auth.userId}/account_data/${eventType}`, content).toPromise().then(() => {
+            // We did it! Save it async now
+            // TODO: Don't save this here, instead wait for it to come down /sync
+            return this.upsert(newEvent);
         }).catch(e => {
             console.error(e);
-            MatrixAccountService.ACCOUNT_DATA[event.type] = oldEvent;
-            MatrixAccountService.ACCOUNT_DATA_STREAM.next(oldEvent); // Send the reverted event
-            return this.persistAccountData(event, null).then(() => Promise.reject(e)); // persist and rethrow
+            this.cache[eventType] = old;
+            this.eventsOut.next(old);
+            return Promise.reject(e);
         });
     }
 
-    public async setRoomAccountData(event: RoomAccountDataEvent, room: MatrixRoom, cacheOnly = false, persistCache = true): Promise<any> {
-        console.log("Updating room account data: " + event.type + " in " + room.id);
-        if (!MatrixAccountService.ROOM_ACCOUNT_DATA[room.id]) MatrixAccountService.ROOM_ACCOUNT_DATA[room.id] = {};
+    private async upsert(event: AccountDataEvent): Promise<any> {
+        await this.dbPromise;
 
-        const oldEvent = await this.getRoomAccountData(event.type, room);
-        MatrixAccountService.ROOM_ACCOUNT_DATA[room.id][event.type] = event;
-        MatrixAccountService.ROOM_ACCOUNT_DATA_STREAM.next({event: event, room: room});
-        if (persistCache) await this.persistAccountData(event, room.id);
-        if (cacheOnly) return; // stop here
+        const dbRecord = {
+            eventType: event.type,
+            content: event.content,
+        };
 
-        return this.put(this.hs.buildCsUrl(`user/${this.auth.userId}/rooms/${room.id}/account_data/${event.type}`, event.content)).toPromise().then(() => {
-            console.log("Successfully saved room account data: " + event.type + " in " + room.id);
-        }).catch(e => {
-            console.error(e);
-            MatrixAccountService.ROOM_ACCOUNT_DATA[room.id][event.type] = oldEvent;
-            MatrixAccountService.ROOM_ACCOUNT_DATA_STREAM.next({event: event, room: room}); // Send the reverted event
-            return this.persistAccountData(event, room.id).then(() => Promise.reject(e)); // persist and rethrow
+        return this.db.getByKey("account_data", event.type).then(record => {
+            if (record) return this.db.update("account_data", dbRecord, event.type);
+            else return this.db.add("account_data", dbRecord);
         });
     }
 
-    private persistAccountData(event: AccountDataEvent, roomId: string): Promise<any> {
-        return this.initDb()
-            .then(() => this.db.getByKey("account_data", {eventType: event.type, roomId: roomId}))
-            .then(record => {
-                // Exists: update
-                return this.db.update("account_data", {
-                    eventType: event.type,
-                    roomId: roomId,
-                    content: event.content
-                }, record.id);
-            }, () => {
-                // Doesn't exist: add
-                return this.db.add("account_data", {
-                    eventType: event.type,
-                    roomId: roomId,
-                    content: event.content
-                });
+    private loadFromDb(): Promise<any> {
+        this.db = new AngularIndexedDB(ACCOUNT_DATA_DB, 1);
+        return this.db.openDatabase(1, evt => {
+            const accountData = evt.currentTarget.result.createObjectStore("account_data", {
+                keyPath: "eventType",
             });
+
+            accountData.createIndex("eventType", "eventType", {unique: false});
+            accountData.createIndex("content", "content", {unique: false});
+        }).then(() => {
+            return this.db.getAll("account_data");
+        }).then(records => {
+            return records.forEach(r => {
+                this.cache[r.eventType] = {type: r.eventType, content: r.content};
+            });
+        });
     }
 }

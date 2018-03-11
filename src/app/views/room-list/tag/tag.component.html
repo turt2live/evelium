@@ -11,7 +11,7 @@
     <div class="room-list" *ngIf="!collapsed">
         <my-room-list-tile *ngFor="let room of filteredRooms()"
                            [room]="room"
-                           [isActive]="activeRoom && activeRoom.id === room.id"
+                           [isActive]="activeRoom && activeRoom.roomId === room.roomId"
         ></my-room-list-tile>
         <div class="more-rooms" *ngIf="numHidden > 0" (click)="fullList = true">
             <span>

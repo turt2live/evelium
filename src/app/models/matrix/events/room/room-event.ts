@@ -1,4 +1,4 @@
-import { MatrixEvent } from "../event";
+import { MatrixEvent, SimpleEvent } from "../event";
 
 export interface RoomEvent extends MatrixEvent {
     sender: string;
@@ -7,6 +7,12 @@ export interface RoomEvent extends MatrixEvent {
     unsigned?: any; // TODO: Determine
 }
 
-export interface IncompleteRoomEvent extends MatrixEvent {
-    event_id: string;
+export class SimpleRoomEvent<T extends string> extends SimpleEvent<T> implements RoomEvent {
+    public event_id: string;
+    public origin_server_ts = 0;
+    public sender: string;
+
+    constructor(type: T, content: any) {
+        super(type, content);
+    }
 }

@@ -1,7 +1,7 @@
 import { Component, Input } from "@angular/core";
-import { MatrixRoom } from "../../../models/matrix/dto/room";
-import { MatrixMediaService } from "../../../services/matrix/media.service";
 import { AvatarComponent } from "../avatar.component";
+import { Room } from "../../../models/matrix/dto/room";
+import { MediaService } from "../../../services/matrix/media.service";
 
 @Component({
     selector: "my-room-avatar",
@@ -10,9 +10,9 @@ import { AvatarComponent } from "../avatar.component";
 })
 export class RoomAvatarComponent extends AvatarComponent {
 
-    @Input() public room: MatrixRoom;
+    @Input() public room: Room;
 
-    constructor(media: MatrixMediaService) {
+    constructor(media: MediaService) {
         super(media)
     }
 

@@ -1,6 +1,6 @@
 import { Component, Input } from "@angular/core";
-import { MatrixRoom } from "../../../models/matrix/dto/room";
-import { MatrixEventService } from "../../../services/matrix/event.service";
+import { Room } from "../../../models/matrix/dto/room";
+import { SimpleRoomMessageEvent } from "../../../models/matrix/events/room/m.room.message";
 
 @Component({
     selector: "my-room-message-composer",
@@ -9,27 +9,19 @@ import { MatrixEventService } from "../../../services/matrix/event.service";
 })
 export class RoomMessageComposerComponent {
 
-    @Input() public room: MatrixRoom;
+    @Input() public room: Room;
 
     public message: string;
 
-    constructor(private events: MatrixEventService) {
+    constructor() {
     }
 
     public sendMessage() {
         if (!this.message || !this.message.trim()) return; // don't send whitespace
 
-        const content = {
-            msgtype: "m.text",
-            body: this.message,
-        };
-
+        const event = new SimpleRoomMessageEvent(this.message);
         this.message = "";
-        this.events.sendEvent("m.room.message", content, this.room).then(() => {
-            console.log("Message sent!");
-        }).catch(err => {
-            console.error(err);
-            // TODO: Some sort of "Failed to send" status
-        });
+
+        this.room.timeline.next(event);
     }
 }

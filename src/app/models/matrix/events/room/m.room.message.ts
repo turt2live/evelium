@@ -1,4 +1,4 @@
-import { RoomEvent } from "./room-event";
+import { RoomEvent, SimpleRoomEvent } from "./room-event";
 
 export interface FileInfo {
     mimetype?: string;
@@ -115,4 +115,13 @@ export interface RoomAudioMessageEvent extends RoomMessageEvent {
         url: string; // mxc
         info?: AudioFileInfo;
     };
+}
+
+export class SimpleRoomMessageEvent extends SimpleRoomEvent<"m.room.message"> implements RoomTextMessageEvent {
+    constructor(message: string) {
+        super("m.room.message", {
+            msgtype: "m.text",
+            body: message,
+        });
+    }
 }

@@ -1,9 +1,9 @@
 import { Component, Input } from "@angular/core";
-import { MatrixRoom } from "../../../models/matrix/dto/room";
-import { MatrixMediaService } from "../../../services/matrix/media.service";
 import { AvatarComponent } from "../avatar.component";
 import { RoomMemberEvent } from "../../../models/matrix/events/room/state/m.room.member";
 import { User } from "../../../models/matrix/dto/user";
+import { MediaService } from "../../../services/matrix/media.service";
+import { Room } from "../../../models/matrix/dto/room";
 
 @Component({
     selector: "my-room-member-avatar",
@@ -13,10 +13,10 @@ import { User } from "../../../models/matrix/dto/user";
 export class RoomMemberAvatarComponent extends AvatarComponent {
 
     @Input() public userId: string;
-    @Input() public room: MatrixRoom;
+    @Input() public room: Room;
     @Input() public usePrevious: boolean;
 
-    constructor(media: MatrixMediaService) {
+    constructor(media: MediaService) {
         super(media)
     }
 

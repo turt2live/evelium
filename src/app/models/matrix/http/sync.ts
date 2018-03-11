@@ -20,19 +20,21 @@ export interface RoomEphemeralTimeline {
     events: EphemeralEvent[];
 }
 
-export interface SyncJoinedRooms {
-    [roomId: string]: {
-        unread_notifications: {
-            highlight_count: number;
-            notification_count: number;
-        };
-        state: {
-            events: RoomStateEvent[];
-        };
-        ephemeral: RoomEphemeralTimeline;
-        account_data: RoomAccountData;
-        timeline: RoomTimeline;
+export interface SyncJoinedRoom{
+    unread_notifications: {
+        highlight_count: number;
+        notification_count: number;
     };
+    state: {
+        events: RoomStateEvent[];
+    };
+    ephemeral: RoomEphemeralTimeline;
+    account_data: RoomAccountData;
+    timeline: RoomTimeline;
+}
+
+export interface SyncJoinedRooms {
+    [roomId: string]: SyncJoinedRoom;
 }
 
 export interface SyncResponse {

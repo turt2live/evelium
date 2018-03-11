@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { MatrixRoom } from "../../../models/matrix/dto/room";
+import { Room } from "../../../models/matrix/dto/room";
 
 @Component({
     selector: "my-room-header",
@@ -8,7 +8,7 @@ import { MatrixRoom } from "../../../models/matrix/dto/room";
 })
 export class RoomHeaderComponent {
 
-    @Input() public room: MatrixRoom;
+    @Input() public room: Room;
 
     constructor() {
     }

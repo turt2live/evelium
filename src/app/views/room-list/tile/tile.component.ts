@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { MatrixRoom } from "../../../models/matrix/dto/room";
+import { Room } from "../../../models/matrix/dto/room";
 import { Router } from "@angular/router";
 
 @Component({
@@ -9,13 +9,13 @@ import { Router } from "@angular/router";
 })
 export class RoomListTileComponent {
 
-    @Input() public room: MatrixRoom;
+    @Input() public room: Room;
     @Input() public isActive: boolean;
 
     constructor(private router: Router) {
     }
 
     public onTileClick(): void {
-        this.router.navigate(['/app/rooms/', this.room.id]);
+        this.router.navigate(['/app/rooms/', this.room.roomId]);
     }
 }

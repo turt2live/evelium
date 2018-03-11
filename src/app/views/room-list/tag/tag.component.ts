@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { MatrixRoom } from "../../../models/matrix/dto/room";
+import { Room } from "../../../models/matrix/dto/room";
 
 @Component({
     selector: "my-room-list-tag",
@@ -8,11 +8,11 @@ import { MatrixRoom } from "../../../models/matrix/dto/room";
 })
 export class RoomListTagComponent {
 
-    @Input() public rooms: MatrixRoom[];
+    @Input() public rooms: Room[];
     @Input() public name: string;
     @Input() public nameFilter: string;
     @Input() public defaultNumShown = -1;
-    @Input() public activeRoom: MatrixRoom;
+    @Input() public activeRoom: Room;
 
     public fullList = false;
     public numHidden = 0;
@@ -22,7 +22,7 @@ export class RoomListTagComponent {
     constructor() {
     }
 
-    public filteredRooms(): MatrixRoom[] {
+    public filteredRooms(): Room[] {
         let filteredRooms = this.rooms;
         if (this.nameFilter) {
             filteredRooms = this.rooms.filter(r => r.displayName.toLowerCase().indexOf(this.nameFilter.toLowerCase()) !== -1);
