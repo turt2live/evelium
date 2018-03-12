@@ -43,6 +43,13 @@ const MAX_MEMORY_TIMELINE_SIZE = 150; // TODO: Configuration?
 // For singleton access
 let roomHandler: RoomHandler;
 
+export interface UpdatedRoomTags {
+    direct: Room[];
+    other: Room[];
+
+    // TODO: Handle real/custom tags like "Work"
+}
+
 @Injectable()
 export class RoomService extends AuthenticatedApi {
 
@@ -57,6 +64,11 @@ export class RoomService extends AuthenticatedApi {
     public get joined(): Observable<Room> {
         this.checkHandler();
         return roomHandler.joined;
+    }
+
+    public get tagged(): Observable<UpdatedRoomTags> {
+        this.checkHandler();
+        return roomHandler.tagged;
     }
 
     public getAll(): Promise<Room[]> {
@@ -80,12 +92,19 @@ interface CachedRoom {
 class RoomHandler {
 
     /**
-     * Observes when rooms are considered joined
+     * Observable view of the joined rooms
      */
     public readonly joined: Observable<Room>;
     private joinedOut: Subject<Room>;
 
+    /**
+     * Observable view of the tagged rooms
+     */
+    public readonly tagged: Observable<UpdatedRoomTags>;
+    private taggedOut: Subject<UpdatedRoomTags>;
+
     private cache: { [roomId: string]: CachedRoom } = {};
+    private directChatIds: string[] = [];
     private api: AuthenticatedApiAccess;
     private db: AngularIndexedDB;
     private dbPromise: Promise<any>;
@@ -96,6 +115,10 @@ class RoomHandler {
         const joinedObservable = new Subject<Room>();
         this.joined = joinedObservable;
         this.joinedOut = joinedObservable;
+
+        const taggedObservable = new ReplaySubject<UpdatedRoomTags>(1);
+        this.tagged = taggedObservable;
+        this.taggedOut = taggedObservable;
 
         this.dbPromise = this.loadFromDb().then(() => console.log("Loaded room information from database"));
 
@@ -154,10 +177,22 @@ class RoomHandler {
             }
         }
 
+        this.directChatIds = directRooms;
+
+        const tagMap: UpdatedRoomTags = {
+            direct: [],
+            other: [],
+        };
+
         for (const roomId in this.cache) {
             const cachedRoom = this.cache[roomId];
             cachedRoom.obj.isDirect = directRooms.indexOf(roomId) !== -1;
+
+            if (cachedRoom.obj.isDirect) tagMap.direct.push(cachedRoom.obj);
+            else tagMap.other.push(cachedRoom.obj);
         }
+
+        this.taggedOut.next(tagMap);
     }
 
     public async getRoomById(roomId: string): Promise<Room> {
@@ -176,6 +211,7 @@ class RoomHandler {
 
         const pendingTimeline = new ReplaySubject<RoomEvent[]>(1);
         room.pendingTimeline = pendingTimeline;
+        room.isDirect = this.directChatIds.indexOf(roomId) !== -1;
 
         const timelineObservable = new ReplaySubject<RoomEvent>(MAX_MEMORY_TIMELINE_SIZE);
         const timelineObserver = {

@@ -19,7 +19,7 @@
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { Subscription } from "rxjs/Subscription";
 import { Room } from "../../models/matrix/dto/room";
-import { RoomService } from "../../services/matrix/room.service";
+import { RoomService, UpdatedRoomTags } from "../../services/matrix/room.service";
 
 interface TaggedRoomList {
     name: string;
@@ -44,6 +44,7 @@ export class RoomListComponent implements OnInit, OnDestroy {
     private tagsById: { [id: string]: TaggedRoomList } = {};
 
     private joinedRoomsSubscription: Subscription;
+    private roomTagSubscription: Subscription;
 
     constructor(private rooms: RoomService) {
     }
@@ -53,35 +54,29 @@ export class RoomListComponent implements OnInit, OnDestroy {
         this.addTag(ROOMS_TAG_ID, "Rooms", 10);
 
         this.joinedRoomsSubscription = this.rooms.joined.subscribe(this.onRoom.bind(this));
-        // TODO: Need a subscription for when the Direct Chats map is updated
+        this.roomTagSubscription = this.rooms.tagged.subscribe(this.onTags.bind(this));
 
         this.rooms.getAll().then(rooms => rooms.forEach(r => this.onRoom(r)));
     }
 
     public ngOnDestroy() {
         if (this.joinedRoomsSubscription) this.joinedRoomsSubscription.unsubscribe();
+        if (this.roomTagSubscription) this.roomTagSubscription.unsubscribe();
     }
 
     private onRoom(room: Room): void {
         const tag = this.tagsById[room.isDirect ? DIRECT_TAG_ID : ROOMS_TAG_ID];
-        tag.rooms.push(room);
+        if (!tag.rooms.find(r => r.roomId === room.roomId))
+            tag.rooms.push(room);
     }
 
-    // private onRoomUpdated(event: RoomUpdatedEvent): void {
-    //     if (event.property !== "isDirect") return;
-    //
-    //     const roomsTag = this.tagsById[ROOMS_TAG_ID];
-    //     const directTag = this.tagsById[DIRECT_TAG_ID];
-    //
-    //     const oldTag = event.room.isDirect ? roomsTag : directTag;
-    //     const newTag = event.room.isDirect ? directTag : roomsTag;
-    //
-    //     let idx = oldTag.rooms.indexOf(event.room);
-    //     if (idx !== -1) oldTag.rooms.splice(idx, 1);
-    //
-    //     idx = newTag.rooms.indexOf(event.room);
-    //     if (idx === -1) newTag.rooms.push(event.room);
-    // }
+    private onTags(event: UpdatedRoomTags): void {
+        const roomsTag = this.tagsById[ROOMS_TAG_ID];
+        const directTag = this.tagsById[DIRECT_TAG_ID];
+
+        roomsTag.rooms = event.other;
+        directTag.rooms = event.direct;
+    }
 
     private addTag(id: string, name: string, defaultNumShown = 0 /* 0 == all */): TaggedRoomList {
         const list: TaggedRoomList = {name: name, rooms: [], defaultNumShown: defaultNumShown};
