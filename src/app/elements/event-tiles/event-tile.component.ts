@@ -42,6 +42,7 @@ export class EventTileComponent implements OnInit, OnDestroy {
     @ViewChild('wrapper', {read: ViewContainerRef}) public wrapper: ViewContainerRef;
 
     @Input() public event: RoomEvent;
+    @Input() public previousEvent: RoomEvent; // nullable
     @Input() public room: Room;
 
     private componentRef: ComponentRef<EventTileComponentBase>;
@@ -86,12 +87,5 @@ export class EventTileComponent implements OnInit, OnDestroy {
         }
 
         return cachedTileMap;
-    }
-
-    public get previousEvent(): RoomEvent {
-        // TODO: Handle getting the previous event
-        // const idx = this.room.timeline.indexOf(this.event);
-        // if (idx > 0) return this.room.timeline[idx - 1];
-        return null;
     }
 }

@@ -58,4 +58,10 @@ export class RoomComponent implements OnInit, OnDestroy, OnChanges {
         this.timeline.push(event);
         if (this.timelineScrollDirective) this.timelineScrollDirective.scrollToBottom();
     }
+
+    public getPreviousEvent(event: RoomEvent): RoomEvent {
+        const idx = this.timeline.indexOf(event);
+        if (idx > 0) return this.timeline[idx - 1];
+        return null;
+    }
 }
