@@ -1,3 +1,21 @@
+/*
+ *     Evelium - A matrix client
+ *     Copyright (C)  2018 Travis Ralston
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { ErrorHandler, Injector, NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { AppComponent } from "./app.component";
@@ -14,16 +32,10 @@ import { LandingComponent } from "./views/landing/landing.component";
 import { SpinnerComponent } from "./elements/spinner/spinner.component";
 import { LoggedInComponent } from "./views/logged-in/logged-in.component";
 import { LoginComponent } from "./views/login/login.component";
-import { MatrixAuthService } from "./services/matrix/auth.service";
-import { MatrixHomeserverService } from "./services/matrix/homeserver.service";
 import { HttpClientModule } from "@angular/common/http";
-import { MatrixSyncService } from "./services/matrix/sync.service";
-import { MatrixRoomService } from "./services/matrix/room.service";
 import { RoomListComponent } from "./views/room-list/room-list.component";
 import { RoomListTagComponent } from "./views/room-list/tag/tag.component";
 import { RoomListTileComponent } from "./views/room-list/tile/tile.component";
-import { MatrixAccountService } from "./services/matrix/account.service";
-import { MatrixMediaService } from "./services/matrix/media.service";
 import {
     PERFECT_SCROLLBAR_CONFIG, PerfectScrollbarConfigInterface,
     PerfectScrollbarModule
@@ -32,7 +44,6 @@ import { RoomComponent } from "./views/room/room.component";
 import { RoomAvatarComponent } from "./elements/avatar/room/room.component";
 import { RoomHeaderComponent } from "./views/room/header/header.component";
 import { RoomMessageComposerComponent } from "./views/room/composer/composer.component";
-import { MatrixEventService } from "./services/matrix/event.service";
 import { MessageEventTileComponent } from "./elements/event-tiles/message/message.component";
 import { RoomMemberAvatarComponent } from "./elements/avatar/room-member/room-member.component";
 import { EventTileComponent } from "./elements/event-tiles/event-tile.component";
@@ -40,6 +51,12 @@ import { MemberEventTileComponent } from "./elements/event-tiles/member/member.c
 import { AppErrorHandler } from "./app.error-handler";
 import { RoomInterfaceComponent } from "./views/logged-in/room-interface/room-interface.component";
 import { HomepageComponent } from "./views/logged-in/homepage/homepage.component";
+import { AccountService } from "./services/matrix/account.service";
+import { AuthService } from "./services/matrix/auth.service";
+import { HomeserverService } from "./services/matrix/homeserver.service";
+import { RoomService } from "./services/matrix/room.service";
+import { SyncService } from "./services/matrix/sync.service";
+import { MediaService } from "./services/matrix/media.service";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 
@@ -84,13 +101,12 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         {provide: Storage, useValue: localStorage},
         {provide: PERFECT_SCROLLBAR_CONFIG, useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG},
         {provide: ErrorHandler, useClass: AppErrorHandler},
-        MatrixAuthService,
-        MatrixHomeserverService,
-        MatrixSyncService,
-        MatrixRoomService,
-        MatrixAccountService,
-        MatrixMediaService,
-        MatrixEventService,
+        AccountService,
+        AuthService,
+        HomeserverService,
+        MediaService,
+        RoomService,
+        SyncService,
 
         // Vendor
     ],

@@ -1,6 +1,25 @@
+/*
+ *     Evelium - A matrix client
+ *     Copyright (C)  2018 Travis Ralston
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { enableProdMode } from "@angular/core";
 import { platformBrowserDynamic } from "@angular/platform-browser-dynamic";
 import { AppModule } from "./app/app.module";
+import { checkDatabases } from "./app/services/matrix/databases";
 
 // depending on the env mode, enable prod mode or add debugging modules
 //noinspection TypeScriptUnresolvedVariable
@@ -8,11 +27,13 @@ if (process.env.ENV === "build") {
     enableProdMode();
 }
 
-export function main(): any {
+export async function main(): Promise<any> {
+    await checkDatabases();
     return platformBrowserDynamic().bootstrapModule(AppModule);
 }
 
 if (document.readyState === "complete") {
+    // noinspection JSIgnoredPromiseFromCall
     main();
 } else {
     document.addEventListener("DOMContentLoaded", main);

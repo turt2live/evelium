@@ -1,5 +1,23 @@
+/*
+ *     Evelium - A matrix client
+ *     Copyright (C)  2018 Travis Ralston
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { Component, Input } from "@angular/core";
-import { MatrixRoom } from "../../../models/matrix/dto/room";
+import { Room } from "../../../models/matrix/dto/room";
 import { Router } from "@angular/router";
 
 @Component({
@@ -9,13 +27,13 @@ import { Router } from "@angular/router";
 })
 export class RoomListTileComponent {
 
-    @Input() public room: MatrixRoom;
+    @Input() public room: Room;
     @Input() public isActive: boolean;
 
     constructor(private router: Router) {
     }
 
     public onTileClick(): void {
-        this.router.navigate(['/app/rooms/', this.room.id]);
+        this.router.navigate(['/app/rooms/', this.room.roomId]);
     }
 }
