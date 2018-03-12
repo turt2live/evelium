@@ -155,20 +155,18 @@ class AccountDataHandler {
         };
 
         return this.db.getByKey("account_data", event.type).then(record => {
-            if (record) return this.db.update("account_data", dbRecord, event.type);
-            else return this.db.add("account_data", dbRecord);
-        });
+            if (record) return this.db.delete("account_data", event.type);
+        }).then(() => this.db.add("account_data", dbRecord));
     }
 
     private loadFromDb(): Promise<any> {
         this.db = new AngularIndexedDB(ACCOUNT_DATA_DB, 1);
         return this.db.openDatabase(1, evt => {
-            const accountData = evt.currentTarget.result.createObjectStore("account_data", {
+            evt.currentTarget.result.createObjectStore("account_data", {
                 keyPath: "eventType",
             });
-
-            accountData.createIndex("eventType", "eventType", {unique: false});
-            accountData.createIndex("content", "content", {unique: false});
+            // accountData.createIndex("eventType", "eventType", {unique: false});
+            // accountData.createIndex("content", "content", {unique: false});
         }).then(() => {
             return this.db.getAll("account_data");
         }).then(records => {

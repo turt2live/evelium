@@ -119,8 +119,6 @@ class RoomHandler {
                 const state = syncRoom.state && syncRoom.state.events ? syncRoom.state.events : [];
                 cachedRoom = await this.prepareRoom(roomId, state);
                 this.joinedOut.next(cachedRoom.obj);
-            } else if (syncRoom.state && syncRoom.state.events) {
-                await this.addEventsToRoom(cachedRoom.obj, syncRoom.state.events);
             }
 
             await this.upsertRoom(cachedRoom.obj);
@@ -255,6 +253,8 @@ class RoomHandler {
         };
 
         return this.db.add("batches", dbRecord);
+
+        // TODO: Trim batches for the room
     }
 
     private async upsertRoom(room: Room): Promise<any> {
@@ -266,9 +266,8 @@ class RoomHandler {
         };
 
         return this.db.getByKey("rooms", room.roomId).then(record => {
-            if (record) return this.db.update("rooms", dbRecord, room.roomId);
-            else return this.db.add("rooms", dbRecord);
-        });
+            if (record) return this.db.delete("rooms", room.roomId);
+        }).then(() => this.db.add("rooms", dbRecord));
     }
 
     private async upsertAccountData(room: Room, event: RoomAccountDataEvent): Promise<any> {
@@ -281,9 +280,8 @@ class RoomHandler {
         };
 
         return this.db.getByKey("account_data", [room.roomId, event.type]).then(record => {
-            if (record) return this.db.update("account_data", dbRecord, [room.roomId, event.type]);
-            else return this.db.add("account_data", dbRecord);
-        });
+            if (record) return this.db.delete("account_data", [room.roomId, event.type]);
+        }).then(() => this.db.add("account_data", dbRecord));
     }
 
     private async upsertEdu(room: Room, event: EphemeralEvent): Promise<any> {
@@ -296,42 +294,40 @@ class RoomHandler {
         };
 
         return this.db.getByKey("edus", [room.roomId, event.type]).then(record => {
-            if (record) return this.db.update("edus", dbRecord, [room.roomId, event.type]);
-            else return this.db.add("edus", dbRecord);
-        });
+            if (record) return this.db.delete("edus", [room.roomId, event.type]);
+        }).then(() => this.db.add("edus", dbRecord));
     }
 
     private loadFromDb(): Promise<any> {
         this.db = new AngularIndexedDB(ROOMS_DB, 1);
         return this.db.openDatabase(1, evt => {
-            const batches = evt.currentTarget.result.createObjectStore("batches", {
+            evt.currentTarget.result.createObjectStore("batches", {
                 keyPath: "id",
                 autoIncrement: true,
             });
-            batches.createIndex("roomId", "roomId", {unique: false});
-            batches.createIndex("prevBatch", "prevBatch", {unique: false});
-            batches.createIndex("events", "events", {unique: false});
+            // batches.createIndex("roomId", "roomId", {unique: false});
+            // batches.createIndex("prevBatch", "prevBatch", {unique: false});
+            // batches.createIndex("events", "events", {unique: false});
 
-            const roomState = evt.currentTarget.result.createObjectStore("rooms", {
+            evt.currentTarget.result.createObjectStore("rooms", {
                 keyPath: "roomId",
             });
-            roomState.createIndex("roomId", "roomId", {unique: true});
-            roomState.createIndex("state", "state", {unique: false});
+            // roomState.createIndex("roomId", "roomId", {unique: true});
+            // roomState.createIndex("state", "state", {unique: false});
 
-            const eduStore = evt.currentTarget.result.createObjectStore("edus", {
+            evt.currentTarget.result.createObjectStore("edus", {
                 keyPath: ["roomId", "eventType"],
             });
-            eduStore.createIndex("roomId", "roomId", {unique: false});
-            eduStore.createIndex("eventType", "eventType", {unique: false});
-            eduStore.createIndex("content", "content", {unique: false});
+            // eduStore.createIndex("roomId", "roomId", {unique: false});
+            // eduStore.createIndex("eventType", "eventType", {unique: false});
+            // eduStore.createIndex("content", "content", {unique: false});
 
-            const accountData = evt.currentTarget.result.createObjectStore("account_data", {
+            evt.currentTarget.result.createObjectStore("account_data", {
                 keyPath: ["roomId", "eventType"],
             });
-
-            accountData.createIndex("roomId", "roomId", {unique: false});
-            accountData.createIndex("eventType", "eventType", {unique: false});
-            accountData.createIndex("content", "content", {unique: false});
+            // accountData.createIndex("roomId", "roomId", {unique: false});
+            // accountData.createIndex("eventType", "eventType", {unique: false});
+            // accountData.createIndex("content", "content", {unique: false});
         }).then(() => {
             return this.db.getAll("rooms");
         }).then(records => {
