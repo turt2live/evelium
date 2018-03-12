@@ -38,7 +38,7 @@ export interface RoomEphemeralTimeline {
     events: EphemeralEvent[];
 }
 
-export interface SyncJoinedRoom{
+export interface SyncJoinedRoom {
     unread_notifications: {
         highlight_count: number;
         notification_count: number;
