@@ -57,6 +57,11 @@ $event_tile_timestamp_fg_color: #696969;
 $event_tile_content_fg_color: $primary_fg_color; // default
 $event_tile_state_content_fg_color: $secondary_fg_color; // default
 
-$event_tile_room_message_text_color: $event_tile_content_fg_color;
-$event_tile_room_message_notice_color: #93d6ff;
-$event_tile_room_message_emote_color: $event_tile_content_fg_color;
+$event_tile_room_message_text_fg_color: $event_tile_content_fg_color;
+$event_tile_room_message_notice_fg_color: #93d6ff;
+$event_tile_room_message_emote_fg_color: $event_tile_content_fg_color;
+$event_tile_room_message_image_bg_color: #cee1ff1f;
+$event_tile_room_message_image_border_color: #222;
+$event_tile_room_message_image_overlay_bg_color: #222222;
+$event_tile_room_message_image_overlay_fg_color: #fff;
+$event_tile_room_message_image_error_color: #ff59597a;

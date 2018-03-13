@@ -60,6 +60,8 @@ import { MediaService } from "./services/matrix/media.service";
 import { TextBody_MessageEventTileComponent } from "./elements/event-tiles/message/text/text.component";
 import { NoticeBody_MessageEventTileComponent } from "./elements/event-tiles/message/notice/notice.component";
 import { EmoteBody_MessageEventTileComponent } from "./elements/event-tiles/message/emote/emote.component";
+import { ImageBody_MessageEventTileComponent } from "./elements/event-tiles/message/image/image.component";
+import { FileSizePipe } from "./pipes/file-size.pipe";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 
@@ -99,6 +101,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         TextBody_MessageEventTileComponent,
         NoticeBody_MessageEventTileComponent,
         EmoteBody_MessageEventTileComponent,
+        ImageBody_MessageEventTileComponent,
+        FileSizePipe,
 
         // Vendor
     ],
@@ -126,6 +130,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         TextBody_MessageEventTileComponent,
         NoticeBody_MessageEventTileComponent,
         EmoteBody_MessageEventTileComponent,
+        ImageBody_MessageEventTileComponent,
     ]
 })
 export class AppModule {

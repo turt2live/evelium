@@ -27,6 +27,7 @@ import { TextBody_MessageEventTileComponent } from "./text/text.component";
 import { NoticeBody_MessageEventTileComponent } from "./notice/notice.component";
 import { EmoteBody_MessageEventTileComponent } from "./emote/emote.component";
 import moment = require("moment");
+import { ImageBody_MessageEventTileComponent } from "./image/image.component";
 
 const MAX_MESSAGE_TIME_BREAK = 2 * 60 * 1000; // 2 minutes
 
@@ -106,6 +107,7 @@ export class MessageEventTileComponent extends EventTileComponentBase implements
                 'm.text': TextBody_MessageEventTileComponent,
                 'm.notice': NoticeBody_MessageEventTileComponent,
                 'm.emote': EmoteBody_MessageEventTileComponent,
+                'm.image': ImageBody_MessageEventTileComponent,
             };
         }
 

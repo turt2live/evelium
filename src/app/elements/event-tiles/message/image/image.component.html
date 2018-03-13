@@ -1,0 +1,48 @@
+<!--
+  ~     Evelium - A matrix client
+  ~     Copyright (C)  2018 Travis Ralston
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="container">
+    <div class="img-container" [ngStyle]="style">
+        <div class="filename" *ngIf="!isLoading && !isError">{{ event.content.body || "image" }}</div>
+        <a [href]="downloadUrl" class="download-button" *ngIf="!isLoading && !isError" download="" target="_blank">
+            <i class="fa fa-download"></i>
+        </a>
+
+        <img class="img"
+             *ngIf="hasUrl"
+             [hidden]="isLoading || isError"
+             [src]="thumbnailUrl"
+             (error)="onImageError($event)"
+             (load)="onImageLoaded($event)"
+             [ngStyle]="style"
+        />
+
+        <div class="img loading" *ngIf="isLoading" [ngStyle]="style">
+            <my-spinner></my-spinner>
+        </div>
+
+        <div class="img error" *ngIf="isError && !isLoading" [ngStyle]="style">
+            <div class="icon"><i class="fa fa-exclamation-circle"></i></div>
+            <div class="message">There was an error showing this image</div>
+        </div>
+
+        <div class="size" *ngIf="!isLoading && !isError && imageEvent.content.info && imageEvent.content.info.size > 0">
+            {{ imageEvent.content.info.size | fileSize:2 }}
+        </div>
+    </div>
+</div>
