@@ -59,6 +59,7 @@ import { SyncService } from "./services/matrix/sync.service";
 import { MediaService } from "./services/matrix/media.service";
 import { TextBody_MessageEventTileComponent } from "./elements/event-tiles/message/text/text.component";
 import { NoticeBody_MessageEventTileComponent } from "./elements/event-tiles/message/notice/notice.component";
+import { EmoteBody_MessageEventTileComponent } from "./elements/event-tiles/message/emote/emote.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 
@@ -97,6 +98,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         HomepageComponent,
         TextBody_MessageEventTileComponent,
         NoticeBody_MessageEventTileComponent,
+        EmoteBody_MessageEventTileComponent,
 
         // Vendor
     ],
@@ -123,6 +125,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         // Event tile bodies
         TextBody_MessageEventTileComponent,
         NoticeBody_MessageEventTileComponent,
+        EmoteBody_MessageEventTileComponent,
     ]
 })
 export class AppModule {
