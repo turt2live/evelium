@@ -26,6 +26,11 @@ import { Room } from "../../models/matrix/dto/room";
 import { RoomEvent } from "../../models/matrix/events/room/room-event";
 import { EventTileComponent } from "../../elements/event-tiles/event-tile.component";
 
+export interface RoomTimelineEvent {
+    event: RoomEvent;
+    previous: RoomTimelineEvent; // nullable
+}
+
 @Component({
     selector: "my-room",
     templateUrl: "./room.component.html",
@@ -38,7 +43,7 @@ export class RoomComponent implements OnInit, OnDestroy, OnChanges, AfterViewIni
 
     @Input() public room: Room;
 
-    public timeline: RoomEvent[] = [];
+    public timeline: RoomTimelineEvent[] = [];
 
     private onBottom = true;
 
@@ -71,13 +76,10 @@ export class RoomComponent implements OnInit, OnDestroy, OnChanges, AfterViewIni
     }
 
     private onTimelineEvent(event: RoomEvent): void {
-        this.timeline.push(event);
-    }
-
-    public getPreviousEvent(event: RoomEvent): RoomEvent {
-        const idx = this.timeline.indexOf(event);
-        if (idx > 0) return this.timeline[idx - 1];
-        return null;
+        this.timeline.push({
+            event: event,
+            previous: this.timeline.length > 0 ? this.timeline[this.timeline.length - 1] : null,
+        });
     }
 
     public onScrollUp() {

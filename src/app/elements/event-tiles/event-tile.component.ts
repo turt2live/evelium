@@ -17,14 +17,14 @@
  */
 
 import {
-    Component, ComponentFactoryResolver, ComponentRef, Input, OnDestroy, OnInit, Type, ViewChild,
+    Component, ComponentFactoryResolver, ComponentRef, Input, OnDestroy, OnInit, Output, Type, ViewChild,
     ViewContainerRef
 } from "@angular/core";
 import { MessageEventTileComponent } from "./message/message.component";
-import { RoomEvent } from "../../models/matrix/events/room/room-event";
 import { MemberEventTileComponent } from "./member/member.component";
 import { EventTileComponentBase } from "./event-tile.component.base";
 import { Room } from "../../models/matrix/dto/room";
+import { RoomTimelineEvent } from "../../views/room/room.component";
 
 interface TileMap {
     [eventType: string]: Type<EventTileComponentBase>;
@@ -41,9 +41,9 @@ export class EventTileComponent implements OnInit, OnDestroy {
 
     @ViewChild('wrapper', {read: ViewContainerRef}) public wrapper: ViewContainerRef;
 
-    @Input() public event: RoomEvent;
-    @Input() public previousEvent: RoomEvent; // nullable
+    @Input() public timelineEvent: RoomTimelineEvent;
     @Input() public room: Room;
+    @Output() public renderable = true;
 
     private componentRef: ComponentRef<EventTileComponentBase>;
 
@@ -51,20 +51,20 @@ export class EventTileComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit() {
-        if (!this.event || !this.room) return;
+        if (!this.timelineEvent || !this.room) return;
 
-        const componentType = this.tileMap[this.event.type];
+        const componentType = this.tileMap[this.timelineEvent.event.type];
         if (!componentType) {
-            console.warn("Cannot render event of type " + this.event.type);
+            console.warn("Cannot render event of type " + this.timelineEvent.event.type);
+            this.renderable = false;
             return;
         }
 
         const factory = this.componentFactoryResolver.resolveComponentFactory(componentType);
         this.componentRef = this.wrapper.createComponent(factory);
 
-        this.componentRef.instance.event = this.event;
+        this.componentRef.instance.timelineEvent = this.timelineEvent;
         this.componentRef.instance.room = this.room;
-        this.componentRef.instance.previousEvent = this.previousEvent;
     }
 
     public ngOnDestroy() {

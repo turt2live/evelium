@@ -16,12 +16,24 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { RoomEvent } from "../../models/matrix/events/room/room-event";
 import { Input } from "@angular/core";
 import { Room } from "../../models/matrix/dto/room";
+import { RoomTimelineEvent } from "../../views/room/room.component";
+import { RoomEvent } from "../../models/matrix/events/room/room-event";
 
 export abstract class EventTileComponentBase {
-    @Input() event: RoomEvent;
-    @Input() previousEvent: RoomEvent;
+    @Input() timelineEvent: RoomTimelineEvent;
     @Input() room: Room;
+
+    public get event(): RoomEvent {
+        return this.timelineEvent.event;
+    }
+
+    public get previousTimelineEvent(): RoomTimelineEvent {
+        return this.timelineEvent.previous ? this.timelineEvent.previous : null;
+    }
+
+    public get previousEvent(): RoomEvent {
+        return this.previousTimelineEvent ? this.previousTimelineEvent.event : null;
+    }
 }

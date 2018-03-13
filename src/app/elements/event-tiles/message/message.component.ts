@@ -22,6 +22,8 @@ import { User } from "../../../models/matrix/dto/user";
 import { EventTileComponentBase } from "../event-tile.component.base";
 import moment = require("moment");
 
+const MAX_MESSAGE_TIME_BREAK = 2 * 60 * 1000; // 2 minutes
+
 @Component({
     selector: "my-message-event-tile",
     templateUrl: "./message.component.html",
@@ -33,14 +35,16 @@ export class MessageEventTileComponent extends EventTileComponentBase {
         super();
     }
 
-    public get showSender(): boolean {
-        if (this.previousEvent) {
-            return this.previousEvent.sender !== this.event.sender || this.previousEvent.type !== "m.room.message";
-        } else return true;
-    }
-
     private getRoomMembers(): RoomMemberEvent[] {
         return this.room.state.filter(e => e.type === "m.room.member").map(e => <RoomMemberEvent>e);
+    }
+
+    public get showSender(): boolean {
+        if (this.previousEvent) {
+            return this.event.origin_server_ts - this.previousEvent.origin_server_ts > MAX_MESSAGE_TIME_BREAK
+                || this.previousEvent.sender !== this.event.sender
+                || this.previousEvent.type !== "m.room.message";
+        } else return true;
     }
 
     public get senderDisplayName(): string {
