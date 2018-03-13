@@ -16,20 +16,4 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<div class="tile" [ngStyle]="{'margin-top': showSender ? '5px' : '0'}">
-    <my-room-member-avatar [room]="room"
-                           [userId]="event.sender"
-                           class="avatar"
-                           [width]="40"
-                           [height]="40"
-                           *ngIf="showSender"
-    ></my-room-member-avatar>
-    <div class="content">
-        <div class="sender-info" *ngIf="showSender">
-            <span class="name">{{ senderDisplayName }}</span>
-            <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
-        </div>
-        <div class="body" #eventBody></div>
-    </div>
-    <div style="clear: both;"><!-- just to make the avatar not break everything --></div>
-</div>
+<span>{{ event.content.body }}</span>

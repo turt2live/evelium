@@ -17,7 +17,7 @@
  */
 
 import {
-    Component, ComponentFactoryResolver, ComponentRef, Input, OnDestroy, OnInit, Output, Type, ViewChild,
+    Component, ComponentFactoryResolver, ComponentRef, Input, OnDestroy, OnInit, Type, ViewChild,
     ViewContainerRef
 } from "@angular/core";
 import { MessageEventTileComponent } from "./message/message.component";
@@ -43,7 +43,6 @@ export class EventTileComponent implements OnInit, OnDestroy {
 
     @Input() public timelineEvent: RoomTimelineEvent;
     @Input() public room: Room;
-    @Output() public renderable = true;
 
     private componentRef: ComponentRef<EventTileComponentBase>;
 
@@ -56,7 +55,6 @@ export class EventTileComponent implements OnInit, OnDestroy {
         const componentType = this.tileMap[this.timelineEvent.event.type];
         if (!componentType) {
             console.warn("Cannot render event of type " + this.timelineEvent.event.type);
-            this.renderable = false;
             return;
         }
 

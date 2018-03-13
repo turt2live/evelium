@@ -57,6 +57,8 @@ import { HomeserverService } from "./services/matrix/homeserver.service";
 import { RoomService } from "./services/matrix/room.service";
 import { SyncService } from "./services/matrix/sync.service";
 import { MediaService } from "./services/matrix/media.service";
+import { TextBody_MessageEventTileComponent } from "./elements/event-tiles/message/text/text.component";
+import { NoticeBody_MessageEventTileComponent } from "./elements/event-tiles/message/notice/notice.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 
@@ -93,6 +95,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         MemberEventTileComponent,
         RoomInterfaceComponent,
         HomepageComponent,
+        TextBody_MessageEventTileComponent,
+        NoticeBody_MessageEventTileComponent,
 
         // Vendor
     ],
@@ -115,6 +119,10 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         // Event tiles
         MessageEventTileComponent,
         MemberEventTileComponent,
+
+        // Event tile bodies
+        TextBody_MessageEventTileComponent,
+        NoticeBody_MessageEventTileComponent,
     ]
 })
 export class AppModule {

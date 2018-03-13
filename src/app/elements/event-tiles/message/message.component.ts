@@ -16,23 +16,62 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component } from "@angular/core";
+import {
+    Component, ComponentFactoryResolver, ComponentRef, OnDestroy, OnInit, Type, ViewChild,
+    ViewContainerRef
+} from "@angular/core";
 import { RoomMemberEvent } from "../../../models/matrix/events/room/state/m.room.member";
 import { User } from "../../../models/matrix/dto/user";
 import { EventTileComponentBase } from "../event-tile.component.base";
+import { TextBody_MessageEventTileComponent } from "./text/text.component";
 import moment = require("moment");
+import { NoticeBody_MessageEventTileComponent } from "./notice/notice.component";
 
 const MAX_MESSAGE_TIME_BREAK = 2 * 60 * 1000; // 2 minutes
+
+interface BodyMap {
+    [msgType: string]: Type<EventTileComponentBase>;
+}
+
+let cachedBodyMap: BodyMap;
 
 @Component({
     selector: "my-message-event-tile",
     templateUrl: "./message.component.html",
     styleUrls: ["./message.component.scss"]
 })
-export class MessageEventTileComponent extends EventTileComponentBase {
+export class MessageEventTileComponent extends EventTileComponentBase implements OnInit, OnDestroy {
 
-    constructor() {
+    @ViewChild('eventBody', {read: ViewContainerRef}) public eventBody: ViewContainerRef;
+
+    private componentRef: ComponentRef<EventTileComponentBase>;
+
+    constructor(private componentFactoryResolver: ComponentFactoryResolver) {
         super();
+    }
+
+    public ngOnInit() {
+        if (!this.timelineEvent || !this.room) return;
+
+        const msgType = this.event.content ? this.event.content.msgtype : null;
+        let componentType = this.bodyMap[msgType];
+        if (!componentType) {
+            console.warn("Cannot render event content of type " + msgType + " - assuming m.text");
+            componentType = this.bodyMap["m.text"]; // This is based on the assumption that we actually have this option
+        }
+
+        const factory = this.componentFactoryResolver.resolveComponentFactory(componentType);
+        this.componentRef = this.eventBody.createComponent(factory);
+
+        this.componentRef.instance.timelineEvent = this.timelineEvent;
+        this.componentRef.instance.room = this.room;
+    }
+
+    public ngOnDestroy() {
+        if (this.componentRef) {
+            this.componentRef.destroy();
+            this.componentRef = null; // just to clean up
+        }
     }
 
     private getRoomMembers(): RoomMemberEvent[] {
@@ -57,5 +96,17 @@ export class MessageEventTileComponent extends EventTileComponentBase {
 
     public get fullTimestamp(): string {
         return moment(this.event.origin_server_ts).format(); // TODO: Actually format the timestamp
+    }
+
+    private get bodyMap(): BodyMap {
+        // This is a copy/paste of the tileMap from Event Tiles - see Event Tiles for more information.
+        if (!cachedBodyMap) {
+            cachedBodyMap = {
+                'm.text': TextBody_MessageEventTileComponent,
+                'm.notice': NoticeBody_MessageEventTileComponent,
+            };
+        }
+
+        return cachedBodyMap;
     }
 }
