@@ -21,10 +21,14 @@
 </div>
 <div class="room" *ngIf="room">
     <my-room-header [room]="room" class="header"></my-room-header>
-    <div class="timeline ps" [perfectScrollbar]="">
+    <div class="timeline ps"
+         [perfectScrollbar]=""
+         (psScrollUp)="onScrollUp($event)"
+         (psYReachEnd)="onEndReached($event)"
+    >
         <div class="events">
-            <my-event-tile class="event-tile"
-                           *ngFor="let event of timeline"
+            <my-event-tile #eventTiles class="event-tile"
+                           *ngFor="let event of timeline; let last = last"
                            [event]="event"
                            [previousEvent]="getPreviousEvent(event)"
                            [room]="room"

@@ -16,26 +16,34 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import {
+    AfterViewInit, Component, Input, OnChanges, OnDestroy, OnInit, QueryList, ViewChild,
+    ViewChildren
+} from "@angular/core";
 import { Subscription } from "rxjs/Subscription";
 import { PerfectScrollbarDirective } from "ngx-perfect-scrollbar";
 import { Room } from "../../models/matrix/dto/room";
 import { RoomEvent } from "../../models/matrix/events/room/room-event";
+import { EventTileComponent } from "../../elements/event-tiles/event-tile.component";
 
 @Component({
     selector: "my-room",
     templateUrl: "./room.component.html",
     styleUrls: ["./room.component.scss"]
 })
-export class RoomComponent implements OnInit, OnDestroy, OnChanges {
+export class RoomComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
 
     @ViewChild(PerfectScrollbarDirective) public timelineScrollDirective: PerfectScrollbarDirective;
+    @ViewChildren('eventTiles') public eventTiles: QueryList<EventTileComponent>;
 
     @Input() public room: Room;
 
     public timeline: RoomEvent[] = [];
 
+    private onBottom = true;
+
     private roomSubscription: Subscription;
+    private eventTilesSubscription: Subscription;
 
     constructor() {
     }
@@ -52,16 +60,33 @@ export class RoomComponent implements OnInit, OnDestroy, OnChanges {
 
     public ngOnDestroy() {
         if (this.roomSubscription) this.roomSubscription.unsubscribe();
+        if (this.eventTilesSubscription) this.eventTilesSubscription.unsubscribe();
+    }
+
+    public ngAfterViewInit() {
+        this.eventTilesSubscription = this.eventTiles.changes.subscribe(() => {
+            // console.log("New tile rendered: " + this.onBottom);
+            if (this.onBottom && this.timelineScrollDirective) this.timelineScrollDirective.scrollToBottom();
+        });
     }
 
     private onTimelineEvent(event: RoomEvent): void {
         this.timeline.push(event);
-        if (this.timelineScrollDirective) this.timelineScrollDirective.scrollToBottom();
     }
 
     public getPreviousEvent(event: RoomEvent): RoomEvent {
         const idx = this.timeline.indexOf(event);
         if (idx > 0) return this.timeline[idx - 1];
         return null;
+    }
+
+    public onScrollUp() {
+        // console.log("Scrolled off bottom");
+        this.onBottom = false;
+    }
+
+    public onEndReached() {
+        // console.log("Scrolled to bottom");
+        this.onBottom = true;
     }
 }
