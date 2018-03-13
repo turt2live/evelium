@@ -18,6 +18,8 @@
 
 import { Pipe, PipeTransform } from '@angular/core';
 
+// Source: https://gist.github.com/JonCatmull/ecdf9441aaa37336d9ae2c7f9cb7289a
+
 /*
  * Convert bytes into largest possible unit.
  * Takes an precision argument that defaults to 2.
@@ -27,7 +29,7 @@ import { Pipe, PipeTransform } from '@angular/core';
  *   {{ 1024 |  fileSize}}
  *   formats to: 1 KB
 */
-@Pipe({name: 'fileSize'})
+@Pipe({name: 'myFileSize'})
 export class FileSizePipe implements PipeTransform {
 
     private units = [
@@ -39,7 +41,7 @@ export class FileSizePipe implements PipeTransform {
         'PB'
     ];
 
-    transform(bytes: number = 0, precision: number = 2): string {
+    public transform(bytes = 0, precision = 2): string {
         if (isNaN(parseFloat(String(bytes))) || !isFinite(bytes)) return '?';
 
         let unit = 0;

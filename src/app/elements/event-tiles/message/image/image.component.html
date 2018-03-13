@@ -42,7 +42,7 @@
         </div>
 
         <div class="size" *ngIf="!isLoading && !isError && imageEvent.content.info && imageEvent.content.info.size > 0">
-            {{ imageEvent.content.info.size | fileSize:2 }}
+            {{ imageEvent.content.info.size | myFileSize:2 }}
         </div>
     </div>
 </div>
