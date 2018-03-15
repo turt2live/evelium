@@ -16,4 +16,9 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<span>{{ event.content.body }}</span>
+<div *ngIf="isHtml">
+    <my-matrix-safe-html [dangerousHtml]="event.content.formatted_body"></my-matrix-safe-html>
+</div>
+<div *ngIf="isPlainText">
+    {{ event.content.body }}
+</div>

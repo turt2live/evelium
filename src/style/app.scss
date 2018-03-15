@@ -15,13 +15,13 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 // styles in src/style directory are applied to the whole page
 @import url('https://fonts.googleapis.com/css?family=Barlow+Condensed:100,200,300,400,500,600,700,800,900&subset=latin-ext');
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700');
 @import '../../node_modules/angular2-toaster/toaster';
 @import '../../node_modules/perfect-scrollbar/css/perfect-scrollbar';
 @import './vars';
+@import './safe-html';
 @import './elements/forms';
 
 html, body {
@@ -72,4 +72,24 @@ button {
 // Hack to hide the rail background
 .ps__rail-y, .ps__rail-x {
   background-color: rgba(0, 0, 0, 0) !important;
+}
+
+a {
+  color: $anchor_color;
+  text-decoration: none;
+}
+
+a:hover {
+  color: $anchor_hover_color;
+  text-decoration: underline;
+}
+
+a:active {
+  color: $anchor_active_color;
+  text-decoration: underline;
+}
+
+a:visited {
+  color: $anchor_visited_color;
+  text-decoration: none;
 }

@@ -21,7 +21,7 @@ import { TextBody_MessageEventTileComponent } from "../text/text.component";
 
 @Component({
     selector: "my-notice-body-message-event-tile",
-    templateUrl: "./notice.component.html",
+    templateUrl: "../text/text.component.html",
     styleUrls: ["./notice.component.scss"]
 })
 export class NoticeBody_MessageEventTileComponent extends TextBody_MessageEventTileComponent {

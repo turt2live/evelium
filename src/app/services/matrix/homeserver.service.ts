@@ -55,6 +55,14 @@ export class HomeserverService {
      * @returns {string} The base URL for the content repository API.
      */
     public get mediaApi(): string {
-        return this.localStorage.getItem("mx.csApiUrl") + "/media/r0";
+        return HomeserverService.MEDIA_API;
+    }
+
+    /**
+     * Gets the base URL for the client/server Content Repository API.
+     * @returns {string} The base URL for the content repository API.
+     */
+    public static get MEDIA_API(): string {
+        return localStorage.getItem("mx.csApiUrl") + "/media/r0";
     }
 }

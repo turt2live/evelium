@@ -64,6 +64,7 @@ import { ImageBody_MessageEventTileComponent } from "./elements/event-tiles/mess
 import { FileSizePipe } from "./pipes/file-size.pipe";
 import * as Showdown from "showdown";
 import showdown = require("showdown");
+import { MatrixSafeHtmlComponent } from "./elements/matrix-safe-html/safe-html.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 const SHOWDOWN_CONVERTER = new showdown.Converter();
@@ -106,6 +107,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         EmoteBody_MessageEventTileComponent,
         ImageBody_MessageEventTileComponent,
         FileSizePipe,
+        MatrixSafeHtmlComponent,
 
         // Vendor
     ],

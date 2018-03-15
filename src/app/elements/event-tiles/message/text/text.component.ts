@@ -29,4 +29,12 @@ export class TextBody_MessageEventTileComponent extends EventTileComponentBase {
     constructor() {
         super();
     }
+
+    public get isPlainText(): boolean {
+        return !this.isHtml;
+    }
+
+    public get isHtml(): boolean {
+        return this.event && this.event.content && this.event.content.format === "org.matrix.custom.html" && this.event.content.formatted_body;
+    }
 }

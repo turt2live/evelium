@@ -28,7 +28,7 @@ import { AuthService } from "./auth.service";
 @Injectable()
 export class MediaService extends AuthenticatedApi {
 
-    constructor(http: HttpClient, auth: AuthService, private hs: HomeserverService) {
+    constructor(http: HttpClient, auth: AuthService) {
         super(http, auth);
     }
 
@@ -41,8 +41,7 @@ export class MediaService extends AuthenticatedApi {
      * @returns {string} The HTTP(S) URL for the thumbnail.
      */
     public mxcToThumbnailUrl(mxc: string, width: number, height: number, method: "crop" | "scale"): string {
-        mxc = this.getMediaPartOnly(mxc);
-        return `${this.hs.mediaApi}/thumbnail/${mxc}?width=${width}&height=${height}&method=${method}`;
+        return MediaService.convertMxcToThumbnailUrl(mxc, width, height, method);
     }
 
     /**
@@ -51,11 +50,10 @@ export class MediaService extends AuthenticatedApi {
      * @returns {string} The HTTP(S) URL for the content.
      */
     public mxcToHttp(mxc: string): string {
-        mxc = this.getMediaPartOnly(mxc);
-        return `${this.hs.mediaApi}/download/${mxc}`;
+        return MediaService.convertMxcToHttp(mxc);
     }
 
-    private getMediaPartOnly(mxc: string): string {
+    private static getMediaPartOnly(mxc: string): string {
         if (!MediaService.isValidMxc(mxc)) throw new Error("Invalid MXC URI");
 
         mxc = mxc.substring("mxc://".length);
@@ -75,5 +73,28 @@ export class MediaService extends AuthenticatedApi {
 
         const parts = url.substring("mxc://".length).split("?")[0].split("/");
         return parts.length >= 2;
+    }
+
+    /**
+     * Converts an MXC URI to an HTTP(S) URL.
+     * @param {string} mxc The MXC URI to convert.
+     * @returns {string} The HTTP(S) URL for the content.
+     */
+    public static convertMxcToHttp(mxc: string): string {
+        mxc = MediaService.getMediaPartOnly(mxc);
+        return `${HomeserverService.MEDIA_API}/download/${mxc}`;
+    }
+
+    /**
+     * Converts an MXC URI to an HTTP(S) URL for a thumbnail.
+     * @param {string} mxc The MXC URI to convert.
+     * @param {number} width The desired width of the thumbnail.
+     * @param {number} height The desired height of the thumbnail.
+     * @param {"crop" | "scale"} method The scaling method to use.
+     * @returns {string} The HTTP(S) URL for the thumbnail.
+     */
+    public static convertMxcToThumbnailUrl(mxc: string, width: number, height: number, method: "crop" | "scale"): string {
+        mxc = MediaService.getMediaPartOnly(mxc);
+        return `${HomeserverService.MEDIA_API}/thumbnail/${mxc}?width=${width}&height=${height}&method=${method}`;
     }
 }

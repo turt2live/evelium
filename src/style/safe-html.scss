@@ -1,0 +1,92 @@
+/*!
+ *     Evelium - A matrix client
+ *     Copyright (C)  2018 Travis Ralston
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+@import './vars';
+
+.matrix-safe-html {
+  h1 {
+    font-size: 2.1rem; // normally 2.5rem
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  h3 {
+    font-size: 1.75rem;
+  }
+
+  h4 {
+    font-size: 1.5rem;
+  }
+
+  h5 {
+    font-size: 1.25rem;
+  }
+
+  h6 {
+    font-size: 1rem;
+  }
+
+  code {
+    background-color: $code_block_bg_color;
+    color: $code_block_fg_color;
+  }
+
+  pre {
+    background-color: $code_block_bg_color;
+    color: $code_block_fg_color;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 30px;
+  }
+
+  img {
+    max-width: 800px;
+    max-height: 600px;
+  }
+
+  ol, ul {
+    padding-left: 25px;
+  }
+
+  table {
+    background-color: $table_bg_color;
+    border: 1px solid $table_border_color;
+    color: $table_fg_color;
+    border-radius: 2px;
+
+    th, td {
+      border: 1px solid $table_border_color;
+      padding: 5px;
+    }
+
+    thead tr {
+      background-color: $table_row_even_bg_color;
+    }
+
+    tbody {
+      tr:nth-child(even) {
+        background-color: $table_row_even_bg_color;
+      }
+
+      tr:nth-child(odd) {
+        background-color: $table_row_odd_bg_color;
+      }
+    }
+  }
+}
