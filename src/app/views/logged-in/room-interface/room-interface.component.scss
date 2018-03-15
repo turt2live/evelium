@@ -28,6 +28,7 @@
     background-color: $room_list_bg_color;
     border-right: 1px solid $room_list_border_color;
     width: 250px;
+    min-width: 250px;
     height: 100vh;
     max-height: 100vh;
     overflow-x: hidden;
