@@ -62,8 +62,11 @@ import { NoticeBody_MessageEventTileComponent } from "./elements/event-tiles/mes
 import { EmoteBody_MessageEventTileComponent } from "./elements/event-tiles/message/emote/emote.component";
 import { ImageBody_MessageEventTileComponent } from "./elements/event-tiles/message/image/image.component";
 import { FileSizePipe } from "./pipes/file-size.pipe";
+import * as Showdown from "showdown";
+import showdown = require("showdown");
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
+const SHOWDOWN_CONVERTER = new showdown.Converter();
 
 @NgModule({
     imports: [
@@ -111,6 +114,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
         {provide: Storage, useValue: localStorage},
         {provide: PERFECT_SCROLLBAR_CONFIG, useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG},
         {provide: ErrorHandler, useClass: AppErrorHandler},
+        {provide: Showdown.Converter, useValue: SHOWDOWN_CONVERTER},
         AccountService,
         AuthService,
         HomeserverService,

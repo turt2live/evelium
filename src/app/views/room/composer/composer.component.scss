@@ -15,7 +15,6 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 @import "../../../../style/vars";
 
 .composer {
@@ -24,9 +23,12 @@
   background-color: $composer_bg_color;
   padding: 5px 5px 5px 10px;
 
-  input {
+  textarea {
     flex: 1 1 auto;
     background-color: $composer_input_bg_color;
+    min-height: 36px;
+    height: 36px;
+    max-height: 75px;
   }
 
   .send-button {

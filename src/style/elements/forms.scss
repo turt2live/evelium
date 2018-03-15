@@ -18,7 +18,7 @@
 
 @import "../vars";
 
-input, button {
+input, button, textarea {
   border: 1px solid $input_border_color;
   display: block;
   color: $input_fg_color;

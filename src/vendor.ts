@@ -27,5 +27,33 @@ import fontawesome from '@fortawesome/fontawesome';
 import solid from '@fortawesome/fontawesome-free-solid';
 import regular from '@fortawesome/fontawesome-free-regular';
 import brands from '@fortawesome/fontawesome-free-brands';
+import * as showdown from 'showdown';
 
 fontawesome.library.add(regular, solid, brands);
+
+const showdownOptions = {
+    omitExtraWLInCodeBlocks: true,
+    noHeaderId: true,
+    customizedHeaderId: false,
+    parseImgDimensions: true,
+    headerLevelStart: 3,
+    simplifiedAutoLink: true,
+    excludeTrailingPunctuationFromURLs: true,
+    literalMidWordUnderscores: true,
+    literalMidWordAsterisks: true,
+    strikethrough: true,
+    tables: true,
+    ghCodeBlocks: true,
+    tasklists: true, // We'll disable the checkboxes in the html
+    disableForced4SpacesIndentedSublists: true,
+    simpleLineBreaks: true,
+    requireSpaceBeforeHeadingText: true,
+    backslashEscapesHTMLTags: true, // TODO: Verify this is actually what we want
+    emoji: true, // Until we have a better library
+    splitAdjacentBlockquotes: true, // Maybe?
+};
+
+for (const opt of Object.keys(showdownOptions)) {
+    showdown.setOption(opt, showdownOptions[opt]);
+}
+showdown.setFlavor("github");

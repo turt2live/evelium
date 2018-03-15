@@ -17,12 +17,12 @@
   -->
 
 <form name="composer" (submit)="sendMessage()" novalidate class="composer">
-    <input type="text"
-           [(ngModel)]="message"
-           name="message"
-           placeholder="Send a message..."
-           autocomplete="off"
-    />
+    <textarea [(ngModel)]="message"
+              name="message"
+              placeholder="Send a message..."
+              autocomplete="off"
+              (keypress)="onKeyPress($event)"
+    ></textarea>
     <button type="submit" class="send-button">
         <i class="fa fa-paper-plane"></i>
     </button>

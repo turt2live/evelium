@@ -19,6 +19,8 @@
 import { Component, Input } from "@angular/core";
 import { Room } from "../../../models/matrix/dto/room";
 import { SimpleRoomMessageEvent } from "../../../models/matrix/events/room/m.room.message";
+import * as Showdown from "showdown";
+import * as KeyCode from "keycode-js";
 
 @Component({
     selector: "my-room-message-composer",
@@ -31,13 +33,23 @@ export class RoomMessageComposerComponent {
 
     public message: string;
 
-    constructor() {
+    constructor(private showdown: Showdown.Converter) {
+    }
+
+    public onKeyPress(evt: KeyboardEvent) {
+        if (evt.keyCode == KeyCode.KEY_RETURN && !evt.shiftKey) {
+            this.sendMessage();
+        }
     }
 
     public sendMessage() {
         if (!this.message || !this.message.trim()) return; // don't send whitespace
 
         const event = new SimpleRoomMessageEvent(this.message);
+
+        const html = this.showdown.makeHtml(this.message);
+        event.content.format = "org.matrix.custom.html";
+        event.content.formatted_body = html;
         this.message = "";
 
         this.room.timeline.next(event);
