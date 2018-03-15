@@ -37,7 +37,7 @@ export class RoomMessageComposerComponent {
     }
 
     public onKeyPress(evt: KeyboardEvent) {
-        if (evt.keyCode == KeyCode.KEY_RETURN && !evt.shiftKey) {
+        if (evt.keyCode === KeyCode.KEY_RETURN && !evt.shiftKey) {
             this.sendMessage();
         }
     }
