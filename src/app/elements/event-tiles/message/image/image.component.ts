@@ -22,7 +22,9 @@ import { MediaService } from "../../../../services/matrix/media.service";
 import { RoomImageMessageEvent } from "../../../../models/matrix/events/room/m.room.message";
 
 const MAX_WIDTH = 700;
+const MIN_WIDTH = 200;
 const MAX_HEIGHT = 300;
+const MIN_HEIGHT = 60;
 
 @Component({
     selector: "my-image-body-message-event-tile",
@@ -78,8 +80,11 @@ export class ImageBody_MessageEventTileComponent extends EventTileComponentBase 
             return {width: MAX_WIDTH, height: MAX_HEIGHT};
         }
 
-        const width = this.imageEvent.content.info.w || MAX_WIDTH;
-        const height = this.imageEvent.content.info.h || MAX_HEIGHT;
+        const width = Math.max(this.imageEvent.content.info.w || MAX_WIDTH, MIN_WIDTH);
+        const height = Math.max(this.imageEvent.content.info.h || MAX_HEIGHT, MIN_HEIGHT);
+
+        if (width <= MAX_WIDTH && height <= MAX_HEIGHT)return { width, height };
+
         const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
 
         return {
