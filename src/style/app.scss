@@ -93,3 +93,7 @@ a:visited {
   color: $anchor_visited_color;
   text-decoration: none;
 }
+
+.nl2br {
+  white-space: pre-line;
+}

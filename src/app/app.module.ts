@@ -62,9 +62,9 @@ import { NoticeBody_MessageEventTileComponent } from "./elements/event-tiles/mes
 import { EmoteBody_MessageEventTileComponent } from "./elements/event-tiles/message/emote/emote.component";
 import { ImageBody_MessageEventTileComponent } from "./elements/event-tiles/message/image/image.component";
 import { FileSizePipe } from "./pipes/file-size.pipe";
+import { MatrixSafeHtmlComponent } from "./elements/matrix-safe-html/safe-html.component";
 import * as Showdown from "showdown";
 import showdown = require("showdown");
-import { MatrixSafeHtmlComponent } from "./elements/matrix-safe-html/safe-html.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 const SHOWDOWN_CONVERTER = new showdown.Converter();

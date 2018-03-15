@@ -19,6 +19,6 @@
 <div *ngIf="isHtml">
     <my-matrix-safe-html [dangerousHtml]="event.content.formatted_body"></my-matrix-safe-html>
 </div>
-<div *ngIf="isPlainText">
-    {{ event.content.body }}
-</div>
+
+<!-- Plain text must be a single line to make the .nl2br class work -->
+<div *ngIf="isPlainText" class="nl2br">{{ event.content.body }}</div>
