@@ -28,7 +28,7 @@
     >
         <div class="events">
             <my-event-tile #eventTiles class="event-tile"
-                           *ngFor="let event of timeline; let last = last"
+                           *ngFor="let event of timeline"
                            [timelineEvent]="event"
                            [room]="room"
             ></my-event-tile>

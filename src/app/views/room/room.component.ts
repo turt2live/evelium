@@ -60,7 +60,11 @@ export class RoomComponent implements OnInit, OnDestroy, OnChanges, AfterViewIni
     public ngOnChanges() {
         this.timeline = [];
         if (this.roomSubscription) this.roomSubscription.unsubscribe();
-        if (this.room) this.roomSubscription = this.room.timeline.subscribe(this.onTimelineEvent.bind(this));
+
+        // HACK: We shouldn't have to do this - why can the event tile subscription not handle this case?
+        setTimeout(() => {
+            if (this.room) this.roomSubscription = this.room.timeline.subscribe(this.onTimelineEvent.bind(this));
+        }, 1);
     }
 
     public ngOnDestroy() {
