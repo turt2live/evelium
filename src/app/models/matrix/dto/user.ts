@@ -24,7 +24,10 @@ export class User {
 
     public static getDisambiguatedName(userId: string, roomMembers: RoomMemberEvent[], usePrevious = false): string {
         const us = roomMembers.find(e => e.state_key === userId);
-        if (!us) throw new Error("Cannot find membership event for " + userId);
+        if (!us) {
+            //console.warn(new Error("Cannot find membership event for " + userId));
+            return userId;
+        }
 
         let ourDisplayName = null;
         if (usePrevious) {
