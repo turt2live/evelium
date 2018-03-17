@@ -21,7 +21,7 @@
               name="message"
               placeholder="Send a message..."
               autocomplete="off"
-              (keypress)="onKeyPress($event)"
+              (keydown)="onKeyDown($event)"
     ></textarea>
     <button type="submit" class="send-button">
         <i class="fa fa-paper-plane"></i>

@@ -36,8 +36,9 @@ export class RoomMessageComposerComponent {
     constructor(private showdown: Showdown.Converter) {
     }
 
-    public onKeyPress(evt: KeyboardEvent) {
+    public onKeyDown(evt: KeyboardEvent) {
         if (evt.keyCode === KeyCode.KEY_RETURN && !evt.shiftKey) {
+            evt.preventDefault();
             this.sendMessage();
         }
     }
