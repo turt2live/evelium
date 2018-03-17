@@ -409,15 +409,15 @@ class RoomHandler {
             this.db.getByKey("rooms", room.roomId).then(() => this.db.delete("rooms", room.roomId))
                 .catch(err => console.error(err)),
             this.db.getAll("account_data").then(records => {
-                const toRemove = records.filter(r => r.roomId == room.roomId);
+                const toRemove = records.filter(r => r.roomId === room.roomId);
                 return toRemove.forEach(r => this.db.delete("account_data", [r.roomId, r.eventType]));
             }).catch(err => console.error(err)),
             this.db.getAll("edus").then(records => {
-                const toRemove = records.filter(r => r.roomId == room.roomId);
+                const toRemove = records.filter(r => r.roomId === room.roomId);
                 return toRemove.forEach(r => this.db.delete("edus", [r.roomId, r.eventType]));
             }).catch(err => console.error(err)),
             this.db.getAll("batches").then(records => {
-                const toRemove = records.filter(r => r.roomId == room.roomId);
+                const toRemove = records.filter(r => r.roomId === room.roomId);
                 return toRemove.forEach(r => this.db.delete("batches", r.id));
             }).catch(err => console.error(err)),
         ]).catch(err => {

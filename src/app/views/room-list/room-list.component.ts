@@ -81,7 +81,7 @@ export class RoomListComponent implements OnInit, OnDestroy {
         for (const tagId in this.tags) {
             const tag = this.tags[tagId];
             const idx = tag.rooms.indexOf(room);
-            if (idx !== -1){
+            if (idx !== -1) {
                 tag.rooms.splice(idx, 1);
                 tag.rooms = tag.rooms.map(r => r); // HACK: Workaround for the list not updating
             }
