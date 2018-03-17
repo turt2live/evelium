@@ -18,10 +18,10 @@
 
 import { Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
 import { Room } from "../../../models/matrix/dto/room";
-import { SimpleRoomMessageEvent } from "../../../models/matrix/events/room/m.room.message";
-import * as Showdown from "showdown";
 import * as KeyCode from "keycode-js";
 import { ElasticDirective } from "../../../directives/elastic.directive";
+import { CommandService } from "../../../services/commands/command.service";
+import { ToasterService } from "angular2-toaster";
 
 @Component({
     selector: "my-room-message-composer",
@@ -37,7 +37,7 @@ export class RoomMessageComposerComponent {
 
     public message: string;
 
-    constructor(private showdown: Showdown.Converter) {
+    constructor(private toaster: ToasterService, private commands: CommandService) {
     }
 
     public onKeyDown(evt: KeyboardEvent) {
@@ -50,17 +50,28 @@ export class RoomMessageComposerComponent {
     public sendMessage() {
         if (!this.message || !this.message.trim()) return; // don't send whitespace
 
-        const event = new SimpleRoomMessageEvent(this.message);
+        let processPromise = Promise.resolve();
+        if (this.commands.isCommand(this.message)) {
+            processPromise = this.commands.process(this.message, this.room);
+        } else {
+            processPromise = Promise.resolve(this.room.sendMessage(this.message));
+        }
 
-        const html = this.showdown.makeHtml(this.message);
-        event.content.format = "org.matrix.custom.html";
-        event.content.formatted_body = html;
-        this.message = "";
+        processPromise.then(() => {
+            this.message = "";
 
-        // HACK: Automatically adjust the field after we reset the content
-        // This is because it doesn't automatically decrease in size.
-        if (this.messageInput) this.messageInput.adjust();
+            // HACK: Automatically adjust the field after we reset the content
+            // This is because it doesn't automatically decrease in size.
+            if (this.messageInput) this.messageInput.adjust();
+        }).catch(err => {
+            let message = "Unexpected error sending message";
+            if (typeof err === "string") {
+                message = err;
+            } else {
+                console.error(err);
+            }
 
-        this.room.timeline.next(event);
+            this.toaster.pop("error", message);
+        });
     }
 }

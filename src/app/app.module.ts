@@ -66,6 +66,7 @@ import { MatrixSafeHtmlComponent } from "./elements/matrix-safe-html/safe-html.c
 import * as Showdown from "showdown";
 import showdown = require("showdown");
 import { ElasticDirective } from "./directives/elastic.directive";
+import { CommandService } from "./services/commands/command.service";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 const SHOWDOWN_CONVERTER = new showdown.Converter();
@@ -125,6 +126,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         MediaService,
         RoomService,
         SyncService,
+        CommandService,
 
         // Vendor
     ],

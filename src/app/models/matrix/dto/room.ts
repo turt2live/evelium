@@ -27,6 +27,9 @@ import { RoomNameEvent } from "../events/room/state/m.room.name";
 import { User } from "./user";
 import { Observable } from "rxjs/Observable";
 import { AuthService } from "../../../services/matrix/auth.service";
+import { SimpleRoomMessageEvent } from "../events/room/m.room.message";
+import * as Showdown from "showdown";
+import { LocatorService } from "../../../services/locator.service";
 
 export class Room {
     public timeline: Subject<RoomEvent>;
@@ -95,5 +98,26 @@ export class Room {
         if (sortedJoinedMembers.length > 2) {
             return `${User.getDisambiguatedName(sortedJoinedMembers[0].state_key, allMembers)} and ${joinedMembers.length - 1} other${joinedMembers.length - 1 !== 1 ? 's' : ''}`;
         }
+    }
+
+    /**
+     * Helper function for sending a message into the room.
+     * @param {string} body The body of the message (eg: "Hello Everyone!")
+     * @param {string} type The type of message, such as m.text, m.emote, or m.notice
+     * @param {boolean} parseMarkdown True to attempt to process the message as Markdown.
+     */
+    public sendMessage(body: string, type = "m.text", parseMarkdown = true) {
+        const event = new SimpleRoomMessageEvent(body);
+        event.content.msgtype = type;
+
+        if (parseMarkdown) {
+            // TODO: Don't send HTML if it's not productive
+            const showdown: Showdown.Converter = LocatorService.injector.get(Showdown.Converter);
+            const html = showdown.makeHtml(body);
+            event.content.format = "org.matrix.custom.html";
+            event.content.formatted_body = html;
+        }
+
+        this.timeline.next(event);
     }
 }
