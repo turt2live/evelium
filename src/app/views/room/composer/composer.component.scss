@@ -23,12 +23,10 @@
   background-color: $composer_bg_color;
   padding: 5px 5px 5px 10px;
 
-  textarea {
+  .entry {
     flex: 1 1 auto;
     background-color: $composer_input_bg_color;
-    min-height: 36px;
-    height: 36px;
-    max-height: 75px;
+    resize: none;
   }
 
   .send-button {

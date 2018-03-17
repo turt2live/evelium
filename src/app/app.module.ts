@@ -65,6 +65,7 @@ import { FileSizePipe } from "./pipes/file-size.pipe";
 import { MatrixSafeHtmlComponent } from "./elements/matrix-safe-html/safe-html.component";
 import * as Showdown from "showdown";
 import showdown = require("showdown");
+import { ElasticDirective } from "./directives/elastic.directive";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 const SHOWDOWN_CONVERTER = new showdown.Converter();
@@ -108,6 +109,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         ImageBody_MessageEventTileComponent,
         FileSizePipe,
         MatrixSafeHtmlComponent,
+        ElasticDirective,
 
         // Vendor
     ],

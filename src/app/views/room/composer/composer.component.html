@@ -18,10 +18,12 @@
 
 <form name="composer" (submit)="sendMessage()" novalidate class="composer">
     <textarea [(ngModel)]="message"
+              class="entry"
               name="message"
               placeholder="Send a message..."
               autocomplete="off"
               (keydown)="onKeyDown($event)"
+              elastic="" [minHeight]="36" [maxHeight]="75" [defaultHeight]="36" (onResize)="onResize.emit()"
     ></textarea>
     <button type="submit" class="send-button">
         <i class="fa fa-paper-plane"></i>

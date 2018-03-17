@@ -86,6 +86,10 @@ export class RoomComponent implements OnInit, OnDestroy, OnChanges, AfterViewIni
         });
     }
 
+    public onComposerResize() {
+        if (this.onBottom && this.timelineScrollDirective) this.timelineScrollDirective.scrollToBottom();
+    }
+
     public onScrollUp() {
         // console.log("Scrolled off bottom");
         this.onBottom = false;
