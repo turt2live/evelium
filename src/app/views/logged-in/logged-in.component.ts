@@ -33,7 +33,7 @@ export class LoggedInComponent implements OnInit {
 
     public ngOnInit() {
         this.sync.startSyncing();
-        const roomSubscription = this.rooms.joined.subscribe(() => {
+        const roomSubscription = this.rooms.currentlyJoined.subscribe(() => {
             this.receivedRoomList = true;
             roomSubscription.unsubscribe(); // we don't care anymore
         });
