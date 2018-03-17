@@ -42,7 +42,9 @@ export class ElasticDirective implements AfterContentChecked {
     }
 
     public adjust(): void {
-        let nativeElement = this.element.nativeElement;
+        const nativeElement = this.element.nativeElement;
+        const previousHeight = nativeElement.style.height;
+
         nativeElement.style.overflow = 'hidden';
         nativeElement.style.height = 'auto';
 
@@ -57,6 +59,7 @@ export class ElasticDirective implements AfterContentChecked {
         }
 
         nativeElement.style.height = newHeight + "px";
-        this.onResize.emit();
+
+        if (previousHeight !== nativeElement.style.height) this.onResize.emit();
     }
 }
