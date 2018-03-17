@@ -44,6 +44,7 @@ export class RoomListComponent implements OnInit, OnDestroy {
     private tagsById: { [id: string]: TaggedRoomList } = {};
 
     private joinedRoomsSubscription: Subscription;
+    private leftRoomsSubscription: Subscription;
     private roomTagSubscription: Subscription;
 
     constructor(private rooms: RoomService) {
@@ -53,21 +54,38 @@ export class RoomListComponent implements OnInit, OnDestroy {
         this.addTag(DIRECT_TAG_ID, "Direct chats", 5);
         this.addTag(ROOMS_TAG_ID, "Rooms", 10);
 
-        this.joinedRoomsSubscription = this.rooms.joined.subscribe(this.onRoom.bind(this));
+        this.joinedRoomsSubscription = this.rooms.joined.subscribe(this.onJoinedRoom.bind(this));
+        this.leftRoomsSubscription = this.rooms.left.subscribe(this.onLeaveRoom.bind(this));
         this.roomTagSubscription = this.rooms.tagged.subscribe(this.onTags.bind(this));
 
-        this.rooms.getAll().then(rooms => rooms.forEach(r => this.onRoom(r)));
+        this.rooms.getAll().then(rooms => rooms.forEach(r => this.onJoinedRoom(r)));
     }
 
     public ngOnDestroy() {
         if (this.joinedRoomsSubscription) this.joinedRoomsSubscription.unsubscribe();
+        if (this.leftRoomsSubscription) this.leftRoomsSubscription.unsubscribe();
         if (this.roomTagSubscription) this.roomTagSubscription.unsubscribe();
     }
 
-    private onRoom(room: Room): void {
+    private onJoinedRoom(room: Room): void {
+        console.log("New room: " + room.roomId);
         const tag = this.tagsById[room.isDirect ? DIRECT_TAG_ID : ROOMS_TAG_ID];
-        if (!tag.rooms.find(r => r.roomId === room.roomId))
+        if (!tag.rooms.find(r => r.roomId === room.roomId)) {
             tag.rooms.push(room);
+            tag.rooms = tag.rooms.map(r => r); // HACK: Workaround for the list not updating
+        }
+    }
+
+    private onLeaveRoom(room: Room): void {
+        console.log("Left room: " + room.roomId);
+        for (const tagId in this.tags) {
+            const tag = this.tags[tagId];
+            const idx = tag.rooms.indexOf(room);
+            if (idx !== -1){
+                tag.rooms.splice(idx, 1);
+                tag.rooms = tag.rooms.map(r => r); // HACK: Workaround for the list not updating
+            }
+        }
     }
 
     private onTags(event: UpdatedRoomTags): void {

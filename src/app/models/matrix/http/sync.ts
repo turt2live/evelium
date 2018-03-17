@@ -24,35 +24,29 @@ import { RoomEvent } from "../events/room/room-event";
 import { EphemeralEvent } from "../events/ephemeral/ephemeral-event";
 import { RoomAccountDataEvent } from "../events/account/room_account/room-account-data-event";
 
-export interface RoomTimeline {
-    limited: boolean;
-    prev_batch: string;
-    events: RoomEvent[];
-}
 
-export interface RoomAccountData {
-    events: RoomAccountDataEvent[];
-}
-
-export interface RoomEphemeralTimeline {
-    events: EphemeralEvent[];
-}
-
-export interface SyncJoinedRoom {
+export interface SyncJoinedRoom extends SyncLeftRoom {
     unread_notifications: {
         highlight_count: number;
         notification_count: number;
     };
+    ephemeral: {
+        events: EphemeralEvent[];
+    };
+}
+
+export interface SyncLeftRoom {
     state: {
         events: RoomStateEvent[];
     };
-    ephemeral: RoomEphemeralTimeline;
-    account_data: RoomAccountData;
-    timeline: RoomTimeline;
-}
-
-export interface SyncJoinedRooms {
-    [roomId: string]: SyncJoinedRoom;
+    account_data: {
+        events: RoomAccountDataEvent[];
+    };
+    timeline: {
+        limited: boolean;
+        prev_batch: string;
+        events: RoomEvent[];
+    };
 }
 
 export interface SyncResponse {
@@ -80,22 +74,11 @@ export interface SyncResponse {
     };
     rooms: {
         leave: {
-            [roomId: string]: {
-                state: {
-                    events: RoomStateEvent[];
-                    state: {
-                        events: RoomStateEvent[];
-                    };
-                    account_data: RoomAccountData;
-                    timeline: {
-                        limited: boolean;
-                        prev_batch: string;
-                        events: RoomEvent[];
-                    }
-                };
-            };
+            [roomId: string]: SyncLeftRoom;
         };
-        join: SyncJoinedRooms;
+        join: {
+            [roomId: string]: SyncJoinedRoom;
+        };
         invite: {
             [roomId: string]: {
                 invite_state: RoomStateEvent[];

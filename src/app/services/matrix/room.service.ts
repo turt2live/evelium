@@ -66,6 +66,16 @@ export class RoomService extends AuthenticatedApi {
         return roomHandler.joined;
     }
 
+    public get currentlyJoined(): Observable<Room[]> {
+        this.checkHandler();
+        return roomHandler.currentlyJoined;
+    }
+
+    public get left(): Observable<Room> {
+        this.checkHandler();
+        return roomHandler.left;
+    }
+
     public get tagged(): Observable<UpdatedRoomTags> {
         this.checkHandler();
         return roomHandler.tagged;
@@ -98,6 +108,18 @@ class RoomHandler {
     private joinedOut: Subject<Room>;
 
     /**
+     * Observable view of the currently joined rooms (replay)
+     */
+    public readonly currentlyJoined: Observable<Room[]>;
+    private currentlyJoinedOut: Subject<Room[]>;
+
+    /**
+     * Observable stream for when rooms are left
+     */
+    public readonly left: Observable<Room>;
+    private leftOut: Subject<Room>;
+
+    /**
      * Observable view of the tagged rooms
      */
     public readonly tagged: Observable<UpdatedRoomTags>;
@@ -116,6 +138,14 @@ class RoomHandler {
         this.joined = joinedObservable;
         this.joinedOut = joinedObservable;
 
+        const currentlyJoinedObservable = new ReplaySubject<Room[]>(1);
+        this.currentlyJoined = currentlyJoinedObservable;
+        this.currentlyJoinedOut = currentlyJoinedObservable;
+
+        const leftObservable = new Subject<Room>();
+        this.left = leftObservable;
+        this.leftOut = leftObservable;
+
         const taggedObservable = new ReplaySubject<UpdatedRoomTags>(1);
         this.tagged = taggedObservable;
         this.taggedOut = taggedObservable;
@@ -130,10 +160,33 @@ class RoomHandler {
     }
 
     private async processSync(response: SyncResponse): Promise<any> {
-        if (!response || !response.rooms || !response.rooms.join) return;
-        console.log("Processing joined rooms from sync response");
+        if (!response || !response.rooms) return;
         await this.dbPromise;
 
+        if (response.rooms.join) this.processJoinedRooms(response);
+        if (response.rooms.leave) this.processLeftRooms(response);
+    }
+
+    private async processLeftRooms(response: SyncResponse): Promise<any> {
+        console.log("Processing left rooms from sync response");
+
+        let updateJoinedRooms = false;
+        for (const roomId in response.rooms.leave) {
+            const cachedRoom = this.cache[roomId];
+            if (!cachedRoom) continue; // Only need to delete if we're actually leaving
+
+            this.deleteRoom(cachedRoom.obj); // let this go async
+            this.leftOut.next(cachedRoom.obj);
+            updateJoinedRooms = true;
+        }
+
+        if (updateJoinedRooms) this.updateJoinedRooms();
+    }
+
+    private async processJoinedRooms(response: SyncResponse): Promise<any> {
+        console.log("Processing joined rooms from sync response");
+
+        let updateJoinedRooms = false;
         for (const roomId in response.rooms.join) {
             const syncRoom: SyncJoinedRoom = response.rooms.join[roomId];
 
@@ -142,6 +195,7 @@ class RoomHandler {
                 const state = syncRoom.state && syncRoom.state.events ? syncRoom.state.events : [];
                 cachedRoom = await this.prepareRoom(roomId, state);
                 this.joinedOut.next(cachedRoom.obj);
+                updateJoinedRooms = true;
             }
 
             await this.upsertRoom(cachedRoom.obj);
@@ -159,6 +213,8 @@ class RoomHandler {
                 syncRoom.ephemeral.events.forEach(e => this.upsertEdu(cachedRoom.obj, e));
             }
         }
+
+        if (updateJoinedRooms) this.updateJoinedRooms();
     }
 
     private async processDirectChats(rawEvent: AccountDataEvent): Promise<any> {
@@ -204,6 +260,15 @@ class RoomHandler {
     public async getAllRooms(): Promise<Room[]> {
         await this.dbPromise;
         return Object.keys(this.cache).map(r => this.cache[r].obj);
+    }
+
+    private updateJoinedRooms() {
+        const joined: Room[] = [];
+        for (const roomId in this.cache) {
+            joined.push(this.cache[roomId].obj);
+        }
+
+        this.currentlyJoinedOut.next(joined);
     }
 
     private async prepareRoom(roomId: string, state: RoomStateEvent[]): Promise<CachedRoom> {
@@ -334,6 +399,32 @@ class RoomHandler {
         }).then(() => this.db.add("edus", dbRecord));
     }
 
+    private async deleteRoom(room: Room): Promise<any> {
+        await this.dbPromise;
+
+        console.log("Purging " + room.roomId + " from the db");
+
+        // TODO: Deleting a room is painfully slow - surely this can be made better?
+        return Promise.all([
+            this.db.getByKey("rooms", room.roomId).then(() => this.db.delete("rooms", room.roomId))
+                .catch(err => console.error(err)),
+            this.db.getAll("account_data").then(records => {
+                const toRemove = records.filter(r => r.roomId == room.roomId);
+                return toRemove.forEach(r => this.db.delete("account_data", [r.roomId, r.eventType]));
+            }).catch(err => console.error(err)),
+            this.db.getAll("edus").then(records => {
+                const toRemove = records.filter(r => r.roomId == room.roomId);
+                return toRemove.forEach(r => this.db.delete("edus", [r.roomId, r.eventType]));
+            }).catch(err => console.error(err)),
+            this.db.getAll("batches").then(records => {
+                const toRemove = records.filter(r => r.roomId == room.roomId);
+                return toRemove.forEach(r => this.db.delete("batches", r.id));
+            }).catch(err => console.error(err)),
+        ]).catch(err => {
+            console.error(err);
+        }).then(() => console.log("Room " + room.roomId + " purged"));
+    }
+
     private loadFromDb(): Promise<any> {
         this.db = new AngularIndexedDB(ROOMS_DB, 1);
         return this.db.openDatabase(1, evt => {
@@ -369,12 +460,16 @@ class RoomHandler {
         }).then(records => {
             return Promise.all(records.map(r => {
                 return this.prepareRoom(r.roomId, r.state).then(room => this.joinedOut.next(room.obj));
-            }));
+            })).then(() => this.updateJoinedRooms());
         }).then(() => {
             return this.db.getAll("batches");
         }).then(records => {
             return Promise.all(records.map(r => {
                 const room = this.cache[r.roomId];
+                if (!room) {
+                    console.warn("Could not find room " + r.roomId + " but we have batches for it");
+                    return;
+                }
                 return this.addEventsToRoom(room.obj, r.events);
             }));
         }).then(() => {

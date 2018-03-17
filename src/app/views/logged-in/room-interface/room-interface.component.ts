@@ -17,7 +17,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Subscription } from "rxjs/Subscription";
 import { Room } from "../../../models/matrix/dto/room";
 import { RoomService } from "../../../services/matrix/room.service";
@@ -32,13 +32,17 @@ export class RoomInterfaceComponent implements OnInit, OnDestroy {
 
     private paramsSubscription: Subscription;
 
-    constructor(private activeRoute: ActivatedRoute, private rooms: RoomService) {
+    constructor(private activeRoute: ActivatedRoute, private rooms: RoomService, private router: Router) {
     }
 
     public ngOnInit() {
         this.paramsSubscription = this.activeRoute.params.subscribe(params => {
-            // TODO: Handle case of room not found
-            this.rooms.getById((params || {})['roomId']).then(r => this.activeRoom = r);
+            this.rooms.getById((params || {})['roomId'])
+                .then(r => this.activeRoom = r)
+                .catch(err => {
+                    console.error(err);
+                    this.router.navigate(['app']); // Redirect elsewhere
+                });
         });
     }
 

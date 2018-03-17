@@ -31,7 +31,7 @@ export class HomepageComponent implements OnInit {
 
     public ngOnInit() {
         let navigated = false;
-        const roomsSubscription = this.rooms.joined.subscribe(() => {
+        const roomsSubscription = this.rooms.currentlyJoined.subscribe(() => {
             if (navigated) return;
 
             navigated = true;
