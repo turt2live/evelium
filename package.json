@@ -66,6 +66,7 @@
     "jquery": "^3.3.1",
     "json-loader": "^0.5.7",
     "keycode-js": "^1.0.0",
+    "lodash": "^4.17.5",
     "moment": "^2.21.0",
     "ngx-modialog": "^5.0.0",
     "ngx-perfect-scrollbar": "^5.3.5",

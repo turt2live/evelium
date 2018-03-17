@@ -16,15 +16,23 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input } from "@angular/core";
+import { Component, Input, OnChanges } from "@angular/core";
 import { Room } from "../../../models/matrix/dto/room";
+import { Subscription } from "rxjs/Subscription";
+import * as _ from 'lodash';
+
+interface RoomEntry {
+    room: Room;
+    lastEvent: number;
+    timelineSubscription: Subscription;
+}
 
 @Component({
     selector: "my-room-list-tag",
     templateUrl: "./tag.component.html",
     styleUrls: ["./tag.component.scss"]
 })
-export class RoomListTagComponent {
+export class RoomListTagComponent implements OnChanges {
 
     @Input() public rooms: Room[];
     @Input() public name: string;
@@ -36,14 +44,50 @@ export class RoomListTagComponent {
     public numHidden = 0;
     public numExtraShown = 0;
     public collapsed = false;
+    public orderedRooms: RoomEntry[] = [];
 
     constructor() {
     }
 
+    public ngOnChanges() {
+        // Drop any rooms that left
+        const toRemove = _.filter(this.orderedRooms, r => this.rooms.indexOf(r.room) === -1);
+        toRemove.forEach(r => {
+            _.remove(this.orderedRooms, r);
+            r.timelineSubscription.unsubscribe();
+        });
+
+        // Add in any new rooms
+        const orderedRoomObjects = this.orderedRooms.map(r => r.room);
+        const toAdd = _.filter(this.rooms, r => orderedRoomObjects.indexOf(r) === -1);
+        toAdd.forEach(r => this.trackRoom(r));
+    }
+
+    private trackRoom(room: Room) {
+        const entry: RoomEntry = {
+            timelineSubscription: null,
+            room: room,
+            lastEvent: 0,
+        };
+        this.orderedRooms.push(entry);
+        entry.timelineSubscription = room.timeline.subscribe(() => {
+            const fakeEntry = <RoomEntry>{lastEvent: new Date().getTime()};
+
+            const nowIndex = this.orderedRooms.indexOf(entry);
+            const targetIndex = _.sortedIndexBy(this.orderedRooms, fakeEntry, e => -e.lastEvent);
+            if (nowIndex !== targetIndex) {
+                _.remove(this.orderedRooms, entry);
+                this.orderedRooms.splice(targetIndex, 0, entry);
+            }
+
+            entry.lastEvent = new Date().getTime();
+        });
+    }
+
     public filteredRooms(): Room[] {
-        let filteredRooms = this.rooms;
+        let filteredRooms = this.orderedRooms;
         if (this.nameFilter) {
-            filteredRooms = this.rooms.filter(r => r.displayName.toLowerCase().indexOf(this.nameFilter.toLowerCase()) !== -1);
+            filteredRooms = this.orderedRooms.filter(r => r.room.displayName.toLowerCase().indexOf(this.nameFilter.toLowerCase()) !== -1);
         }
 
         if (this.defaultNumShown > 0 && !this.fullList) {
@@ -55,6 +99,6 @@ export class RoomListTagComponent {
             this.numHidden = 0;
         }
 
-        return filteredRooms;
+        return filteredRooms.map(r => r.room);
     }
 }
