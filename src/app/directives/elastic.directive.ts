@@ -20,16 +20,13 @@ import { AfterContentChecked, Directive, ElementRef, EventEmitter, HostListener,
 // Based on: http://resolvethis.com/how-to-create-an-auto-grow-directive-in-angular-2/
 
 @Directive({
-    selector: '[elastic]',
-    host: {
-        '(input)': 'adjust()'
-    }
+    selector: '[myElastic]',
 })
 export class ElasticDirective implements AfterContentChecked {
 
-    @Input() public minHeight: number = 0;
+    @Input() public minHeight = 0;
     @Input() public defaultHeight: number;
-    @Input() public maxHeight: number = Infinity;
+    @Input() public maxHeight = Infinity;
     @Output() public onResize: EventEmitter<any> = new EventEmitter<any>();
 
     constructor(public element: ElementRef) {
