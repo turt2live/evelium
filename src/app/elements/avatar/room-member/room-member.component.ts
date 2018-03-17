@@ -32,7 +32,6 @@ export class RoomMemberAvatarComponent extends AvatarComponent {
 
     @Input() public userId: string;
     @Input() public room: Room;
-    @Input() public usePrevious: boolean;
 
     constructor(media: MediaService) {
         super(media)
@@ -44,10 +43,8 @@ export class RoomMemberAvatarComponent extends AvatarComponent {
         const memberEvent = <RoomMemberEvent>this.room.state.find(e => e.type === "m.room.member" && e.state_key === this.userId);
         if (!memberEvent || !memberEvent.content) return null;
 
-        if (this.usePrevious) {
-            if (memberEvent.unsigned && memberEvent.unsigned.prev_content)
-                return memberEvent.unsigned.prev_content.avatar_url;
-        }
+        if (memberEvent.content.membership === "leave" || memberEvent.content.membership === "ban")
+            return memberEvent.unsigned && memberEvent.unsigned.prev_content ? memberEvent.unsigned.prev_content.avatar_url : null;
 
         return memberEvent.content.avatar_url;
     }
@@ -56,6 +53,6 @@ export class RoomMemberAvatarComponent extends AvatarComponent {
         if (!this.room) return null;
 
         const members = this.room.state.filter(e => e.type === "m.room.member").map(e => <RoomMemberEvent>e);
-        return User.getDisambiguatedName(this.userId, members, this.usePrevious);
+        return User.getDisambiguatedName(this.userId, members);
     }
 }

@@ -22,7 +22,7 @@ export class User {
     private constructor() {
     }
 
-    public static getDisambiguatedName(userId: string, roomMembers: RoomMemberEvent[], usePrevious = false): string {
+    public static getDisambiguatedName(userId: string, roomMembers: RoomMemberEvent[]): string {
         const us = roomMembers.find(e => e.state_key === userId);
         if (!us) {
             //console.warn(new Error("Cannot find membership event for " + userId));
@@ -30,10 +30,12 @@ export class User {
         }
 
         let ourDisplayName = null;
-        if (usePrevious) {
-            ourDisplayName = us.unsigned && us.unsigned.prev_content ? us.unsigned.prev_content.displayname : null;
-        } else {
-            ourDisplayName = us.content ? us.content.displayname : null;
+        if (us.content) {
+            if (us.content.membership === "leave" || us.content.membership === "ban") {
+                ourDisplayName = us.unsigned && us.unsigned.prev_content ? us.unsigned.prev_content.displayname : null;
+            } else {
+                ourDisplayName = us.content.displayname;
+            }
         }
         if (!ourDisplayName) return userId;
 

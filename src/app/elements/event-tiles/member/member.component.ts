@@ -58,10 +58,6 @@ export class MemberEventTileComponent extends EventTileComponentBase {
         return moment(this.event.origin_server_ts).format(); // TODO: Actually format the timestamp
     }
 
-    public get isLeaving(): boolean {
-        return this.memberEvent.content.membership === "leave" || this.memberEvent.content.membership === "ban";
-    }
-
     public get description(): string {
         let prevContent: any = {};
         if (this.memberEvent.unsigned && this.memberEvent.unsigned.prev_content)
