@@ -67,7 +67,7 @@ export class ImageBody_MessageEventTileComponent extends EventTileComponentBase 
 
     public get thumbnailUrl(): string {
         if (!this.hasUrl) return null;
-        return this.media.mxcToThumbnailUrl(this.mxcUrl, this.width, this.height, "crop");
+        return this.media.mxcToThumbnailUrl(this.mxcUrl, this.width, this.height, "scale");
     }
 
     public get downloadUrl(): string {
