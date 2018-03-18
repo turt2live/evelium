@@ -24,7 +24,11 @@
                     [forcedAvatarUrl]="previousTargetContent.avatar_url"
     ></my-member-pill>
     <span class="description">changed their display name and avatar to</span>
-    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+    <my-member-pill [userId]="target.state_key"
+                    [room]="room"
+                    [forcedDisplayName]="target.content.displayname"
+                    [forcedAvatarUrl]="target.content.avatar_url"
+    ></my-member-pill>
 
     <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
 </div>
@@ -34,9 +38,14 @@
     <my-member-pill [userId]="target.state_key"
                     [room]="room"
                     [forcedDisplayName]="previousTargetContent.displayname"
+                    [forcedAvatarUrl]="previousTargetContent.avatar_url"
     ></my-member-pill>
     <span class="description">changed their display name to</span>
-    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+    <my-member-pill [userId]="target.state_key"
+                    [room]="room"
+                    [forcedDisplayName]="target.content.displayname"
+                    [forcedAvatarUrl]="target.content.avatar_url"
+    ></my-member-pill>
 
     <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
 </div>
@@ -45,10 +54,15 @@
 <div class="tile" *ngIf="determinedState === 'avatar'">
     <my-member-pill [userId]="target.state_key"
                     [room]="room"
+                    [forcedDisplayName]="previousTargetContent.displayname"
                     [forcedAvatarUrl]="previousTargetContent.avatar_url"
     ></my-member-pill>
     <span class="description">changed their avatar to</span>
-    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+    <my-member-pill [userId]="target.state_key"
+                    [room]="room"
+                    [forcedDisplayName]="target.content.displayname"
+                    [forcedAvatarUrl]="target.content.avatar_url"
+    ></my-member-pill>
 
     <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
 </div>

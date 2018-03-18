@@ -20,6 +20,7 @@ import { Input } from "@angular/core";
 import { Room } from "../../models/matrix/dto/room";
 import { RoomTimelineEvent } from "../../views/room/room.component";
 import { RoomEvent } from "../../models/matrix/events/room/room-event";
+import { RoomMemberEvent } from "../../models/matrix/events/room/state/m.room.member";
 
 export abstract class EventTileComponentBase {
     @Input() timelineEvent: RoomTimelineEvent;
@@ -35,5 +36,10 @@ export abstract class EventTileComponentBase {
 
     public get previousEvent(): RoomEvent {
         return this.previousTimelineEvent ? this.previousTimelineEvent.event : null;
+    }
+
+    public get sender(): RoomMemberEvent {
+        return this.room.state.filter(e => e.type === "m.room.member").map(e => <RoomMemberEvent>e)
+            .find(e => e.state_key === this.event.sender);
     }
 }

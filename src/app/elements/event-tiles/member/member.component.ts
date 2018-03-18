@@ -37,11 +37,6 @@ export class MemberEventTileComponent extends EventTileComponentBase {
         return <RoomMemberEvent>this.event;
     }
 
-    public get sender(): RoomMemberEvent {
-        return this.room.state.filter(e => e.type === "m.room.member").map(e => <RoomMemberEvent>e)
-            .find(e => e.state_key === this.target.sender);
-    }
-
     public get timestamp(): string {
         return moment(this.event.origin_server_ts).fromNow();
     }

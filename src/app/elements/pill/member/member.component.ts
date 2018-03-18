@@ -45,6 +45,7 @@ export class MemberPillComponent {
     }
 
     public get displayName(): string {
+        if (this.forcedDisplayName) return this.forcedDisplayName;
         return User.getDisambiguatedName(this.userId, this.getRoomMembers());
     }
 }
