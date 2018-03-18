@@ -67,6 +67,7 @@ import * as Showdown from "showdown";
 import showdown = require("showdown");
 import { ElasticDirective } from "./directives/elastic.directive";
 import { CommandService } from "./services/commands/command.service";
+import { MemberPillComponent } from "./elements/pill/member/member.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 const SHOWDOWN_CONVERTER = new showdown.Converter();
@@ -111,6 +112,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         FileSizePipe,
         MatrixSafeHtmlComponent,
         ElasticDirective,
+        MemberPillComponent,
 
         // Vendor
     ],

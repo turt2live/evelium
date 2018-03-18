@@ -15,16 +15,20 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 @import "../../../../style/vars";
 
-.tile {
-  padding-left: 10px;
-  color: $event_tile_state_content_fg_color;
+.pill {
+  display: inline-block;
+  border: 1px solid $pill_border_color;
+  background-color: $pill_bg_color;
+  border-radius: 2px;
+  padding: 1px 3px;
+  font-size: 0.75em;
+  margin-top: -1px;
 
-  .timestamp {
-    color: $event_tile_timestamp_fg_color;
-    font-weight: 100;
-    margin-left: 2px;
+  .avatar {
+  }
+
+  .name {
   }
 }

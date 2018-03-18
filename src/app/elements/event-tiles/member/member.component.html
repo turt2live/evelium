@@ -16,13 +16,117 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<div class="tile">
-    <my-room-member-avatar [room]="room"
-                           [userId]="event.state_key"
-                           class="avatar"
-                           [width]="15"
-                           [height]="15"
-    ></my-room-member-avatar>
-    <span class="body">{{ description }}</span>
+<!-- DISPLAY NAME AND AVATAR -->
+<div class="tile" *ngIf="determinedState === 'displayname_avatar'">
+    <my-member-pill [userId]="target.state_key"
+                    [room]="room"
+                    [forcedDisplayName]="previousTargetContent.displayname"
+                    [forcedAvatarUrl]="previousTargetContent.avatar_url"
+    ></my-member-pill>
+    <span class="description">changed their display name and avatar to</span>
+    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+
     <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
 </div>
+
+<!-- DISPLAY NAME ONLY -->
+<div class="tile" *ngIf="determinedState === 'displayname'">
+    <my-member-pill [userId]="target.state_key"
+                    [room]="room"
+                    [forcedDisplayName]="previousTargetContent.displayname"
+    ></my-member-pill>
+    <span class="description">changed their display name to</span>
+    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+
+    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+</div>
+
+<!-- AVATAR ONLY -->
+<div class="tile" *ngIf="determinedState === 'avatar'">
+    <my-member-pill [userId]="target.state_key"
+                    [room]="room"
+                    [forcedAvatarUrl]="previousTargetContent.avatar_url"
+    ></my-member-pill>
+    <span class="description">changed their avatar to</span>
+    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+
+    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+</div>
+
+<!-- JOINED -->
+<div class="tile" *ngIf="determinedState === 'join'">
+    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+    <span class="description">joined the room</span>
+
+    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+</div>
+
+<!-- LEFT -->
+<div class="tile" *ngIf="determinedState === 'left'">
+    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+    <span class="description">left the room</span>
+
+    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+</div>
+
+<!-- KICKED -->
+<div class="tile" *ngIf="determinedState === 'kick'">
+    <my-member-pill [userId]="sender.state_key" [room]="room"></my-member-pill>
+    <span class="description">kicked</span>
+    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+    <span class="description">
+        from the room
+        <span class="reason" *ngIf="target.content.reason"> for "{{ target.content.reason }}"</span>
+    </span>
+
+    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+</div>
+
+<!-- BANNED -->
+<div class="tile" *ngIf="determinedState === 'ban'">
+    <my-member-pill [userId]="sender.state_key" [room]="room"></my-member-pill>
+    <span class="description">banned</span>
+    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+    <span class="description">
+        from the room
+        <span class="reason" *ngIf="target.content.reason"> for "{{ target.content.reason }}"</span>
+    </span>
+
+    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+</div>
+
+<!-- UNBANNED -->
+<div class="tile" *ngIf="determinedState === 'unban'">
+    <my-member-pill [userId]="sender.state_key" [room]="room"></my-member-pill>
+    <span class="description">lifted the ban on</span>
+    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+
+    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+</div>
+
+<!-- INVITED -->
+<div class="tile" *ngIf="determinedState === 'invite'">
+    <my-member-pill [userId]="sender.state_key" [room]="room"></my-member-pill>
+    <span class="description">invited</span>
+    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+    <span class="description">to the room</span>
+
+    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+</div>
+
+<!-- DECLINED INVITE -->
+<div class="tile" *ngIf="determinedState === 'decline'">
+    <my-member-pill [userId]="sender.state_key" [room]="room"></my-member-pill>
+    <span class="description">declined the invite</span>
+
+    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+</div>
+
+<!-- UNKNOWN -->
+<div class="tile" *ngIf="determinedState === 'none'">
+    <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
+    <span class="description">had their membership updated</span>
+
+    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+</div>
+

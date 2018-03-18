@@ -32,12 +32,15 @@ export class RoomMemberAvatarComponent extends AvatarComponent {
 
     @Input() public userId: string;
     @Input() public room: Room;
+    @Input() public forcedAvatarUrl: string;
+    @Input() public forcedDisplayName: string;
 
     constructor(media: MediaService) {
         super(media)
     }
 
     public get mxcUrl(): string {
+        if (this.forcedAvatarUrl) return this.forcedAvatarUrl;
         if (!this.room) return null;
 
         const memberEvent = <RoomMemberEvent>this.room.state.find(e => e.type === "m.room.member" && e.state_key === this.userId);
@@ -50,6 +53,7 @@ export class RoomMemberAvatarComponent extends AvatarComponent {
     }
 
     public get displayName(): string {
+        if (this.forcedDisplayName) return this.forcedDisplayName;
         if (!this.room) return null;
 
         const members = this.room.state.filter(e => e.type === "m.room.member").map(e => <RoomMemberEvent>e);
