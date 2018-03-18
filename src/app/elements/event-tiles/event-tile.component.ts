@@ -27,6 +27,7 @@ import { Room } from "../../models/matrix/dto/room";
 import { RoomTimelineEvent } from "../../views/room/room.component";
 import { CreateRoomEventTileComponent } from "./state/create/create.component";
 import { RoomNameEventTileComponent } from "./state/name/name.component";
+import { RoomTopicEventTileComponent } from "./state/topic/topic.component";
 
 interface TileMap {
     [eventType: string]: Type<EventTileComponentBase>;
@@ -85,6 +86,7 @@ export class EventTileComponent implements OnInit, OnDestroy {
                 'm.room.member': MemberEventTileComponent,
                 'm.room.create': CreateRoomEventTileComponent,
                 'm.room.name': RoomNameEventTileComponent,
+                'm.room.topic': RoomTopicEventTileComponent,
             };
         }
 

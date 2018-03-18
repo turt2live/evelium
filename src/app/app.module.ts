@@ -70,6 +70,7 @@ import { MemberPillComponent } from "./elements/pill/member/member.component";
 import { CreateRoomEventTileComponent } from "./elements/event-tiles/state/create/create.component";
 import showdown = require("showdown");
 import { RoomNameEventTileComponent } from "./elements/event-tiles/state/name/name.component";
+import { RoomTopicEventTileComponent } from "./elements/event-tiles/state/topic/topic.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 const SHOWDOWN_CONVERTER = new showdown.Converter();
@@ -117,6 +118,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         MemberPillComponent,
         CreateRoomEventTileComponent,
         RoomNameEventTileComponent,
+        RoomTopicEventTileComponent,
 
         // Vendor
     ],
@@ -143,6 +145,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         MemberEventTileComponent,
         CreateRoomEventTileComponent,
         RoomNameEventTileComponent,
+        RoomTopicEventTileComponent,
 
         // Event tile bodies
         TextBody_MessageEventTileComponent,
