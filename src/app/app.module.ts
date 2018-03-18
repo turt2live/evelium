@@ -71,6 +71,7 @@ import { CreateRoomEventTileComponent } from "./elements/event-tiles/state/creat
 import showdown = require("showdown");
 import { RoomNameEventTileComponent } from "./elements/event-tiles/state/name/name.component";
 import { RoomTopicEventTileComponent } from "./elements/event-tiles/state/topic/topic.component";
+import { EventTileService } from "./services/event-tile.service";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 const SHOWDOWN_CONVERTER = new showdown.Converter();
@@ -135,6 +136,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         RoomService,
         SyncService,
         CommandService,
+        EventTileService,
 
         // Vendor
     ],

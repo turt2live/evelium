@@ -17,23 +17,14 @@
  */
 
 import {
-    Component, ComponentFactoryResolver, ComponentRef, Input, OnDestroy, OnInit, Type, ViewChild,
+    Component, ComponentFactoryResolver, ComponentRef, Input, OnDestroy, OnInit, ViewChild,
     ViewContainerRef
 } from "@angular/core";
-import { MessageEventTileComponent } from "./message/message.component";
-import { MemberEventTileComponent } from "./state/member/member.component";
 import { EventTileComponentBase } from "./event-tile.component.base";
 import { Room } from "../../models/matrix/dto/room";
 import { RoomTimelineEvent } from "../../views/room/room.component";
-import { CreateRoomEventTileComponent } from "./state/create/create.component";
-import { RoomNameEventTileComponent } from "./state/name/name.component";
-import { RoomTopicEventTileComponent } from "./state/topic/topic.component";
+import { EventTileService } from "../../services/event-tile.service";
 
-interface TileMap {
-    [eventType: string]: Type<EventTileComponentBase>;
-}
-
-let cachedTileMap: TileMap;
 
 @Component({
     selector: "my-event-tile",
@@ -49,13 +40,13 @@ export class EventTileComponent implements OnInit, OnDestroy {
 
     private componentRef: ComponentRef<EventTileComponentBase>;
 
-    constructor(private componentFactoryResolver: ComponentFactoryResolver) {
+    constructor(private componentFactoryResolver: ComponentFactoryResolver, private tiles: EventTileService) {
     }
 
     public ngOnInit() {
         if (!this.timelineEvent || !this.room) return;
 
-        const componentType = this.tileMap[this.timelineEvent.event.type];
+        const componentType = this.tiles.tileMap[this.timelineEvent.event.type];
         if (!componentType) {
             console.warn("Cannot render event of type " + this.timelineEvent.event.type);
             return;
@@ -73,23 +64,5 @@ export class EventTileComponent implements OnInit, OnDestroy {
             this.componentRef.destroy();
             this.componentRef = null; // just to clean up
         }
-    }
-
-    private get tileMap(): TileMap {
-        // This is done as a instance getter with an external cache property to ensure that
-        // the component classes are fully set up by the time we need them. If this map
-        // was created as a regular static property then we'd have the issue of components
-        // being seen as undefined.
-        if (!cachedTileMap) {
-            cachedTileMap = {
-                'm.room.message': MessageEventTileComponent,
-                'm.room.member': MemberEventTileComponent,
-                'm.room.create': CreateRoomEventTileComponent,
-                'm.room.name': RoomNameEventTileComponent,
-                'm.room.topic': RoomTopicEventTileComponent,
-            };
-        }
-
-        return cachedTileMap;
     }
 }

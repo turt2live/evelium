@@ -37,6 +37,7 @@ import { Injectable } from "@angular/core";
 import { AccountService } from "./account.service";
 import { AccountDataEvent } from "../../models/matrix/events/account/account-data-event";
 import { DirectChatsEventContent } from "../../models/matrix/events/account/m.direct";
+import { EventTileService } from "../event-tile.service";
 
 const MAX_MEMORY_TIMELINE_SIZE = 150; // TODO: Configuration?
 
@@ -53,12 +54,14 @@ export interface UpdatedRoomTags {
 @Injectable()
 export class RoomService extends AuthenticatedApi {
 
-    constructor(http: HttpClient, auth: AuthService, private sync: SyncService, private account: AccountService, private hs: HomeserverService) {
+    constructor(http: HttpClient, auth: AuthService, private sync: SyncService,
+                private account: AccountService, private hs: HomeserverService,
+                private tiles: EventTileService) {
         super(http, auth);
     }
 
     private checkHandler(): void {
-        if (!roomHandler) roomHandler = new RoomHandler(this.http, this.auth, this.sync, this.account, this.hs);
+        if (!roomHandler) roomHandler = new RoomHandler(this.http, this.auth, this.sync, this.account, this.hs, this.tiles);
     }
 
     public get joined(): Observable<Room> {
@@ -131,7 +134,8 @@ class RoomHandler {
     private db: AngularIndexedDB;
     private dbPromise: Promise<any>;
 
-    constructor(http: HttpClient, auth: AuthService, sync: SyncService, account: AccountService, private hs: HomeserverService) {
+    constructor(http: HttpClient, auth: AuthService, sync: SyncService, account: AccountService,
+                private hs: HomeserverService, private tiles: EventTileService) {
         this.api = new AuthenticatedApiAccess(http, auth);
 
         const joinedObservable = new Subject<Room>();
@@ -337,8 +341,9 @@ class RoomHandler {
                 room.state.push(stateEvent);
             }
 
-            // Now process the event normally (add to timeline)
-            cachedRoom.timelineOut.next(event);
+            // Now process the event normally (add to timeline), assuming we can render it
+            if (this.tiles.isRenderable(event)) cachedRoom.timelineOut.next(event);
+            else console.warn("Event of type '" + event.type + "' is not renderable");
         }
 
         return Promise.resolve();
