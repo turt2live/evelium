@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-var isProd = process.env.npm_lifecycle_event === 'build';
+var isProd = ['build', 'build:ci'].indexOf(process.env.npm_lifecycle_event) !== -1;
 
 module.exports = function () {
     const config = {};
