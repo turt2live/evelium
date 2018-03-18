@@ -19,6 +19,7 @@
 import { Component, OnInit } from "@angular/core";
 import { SyncService } from "../../services/matrix/sync.service";
 import { RoomService } from "../../services/matrix/room.service";
+import { NotificationsService } from "../../services/matrix/notifications.service";
 
 @Component({
     templateUrl: "./logged-in.component.html",
@@ -28,7 +29,8 @@ export class LoggedInComponent implements OnInit {
 
     public receivedRoomList = false;
 
-    constructor(private sync: SyncService, private rooms: RoomService) {
+    constructor(private sync: SyncService, private rooms: RoomService, notifications: NotificationsService) {
+        notifications.getPushRules();
     }
 
     public ngOnInit() {

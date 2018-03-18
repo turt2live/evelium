@@ -68,7 +68,7 @@ export class EventTileService {
      * @param {RoomEvent} event The event to check
      * @returns {boolean} True if the event is renderable, false otherwise
      */
-    public isRenderable(event: RoomEvent): boolean{
+    public isRenderable(event: RoomEvent): boolean {
         return !!this.tileMap[event.type];
     }
 }
