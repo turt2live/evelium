@@ -19,7 +19,6 @@
 import { Component } from "@angular/core";
 import { RoomMemberEvent, RoomMemberEventContent } from "../../../models/matrix/events/room/state/m.room.member";
 import { EventTileComponentBase } from "../event-tile.component.base";
-import moment = require("moment");
 
 @Component({
     selector: "my-member-event-tile",
@@ -35,14 +34,6 @@ export class MemberEventTileComponent extends EventTileComponentBase {
     public get target(): RoomMemberEvent {
         // This is a safe cast
         return <RoomMemberEvent>this.event;
-    }
-
-    public get timestamp(): string {
-        return moment(this.event.origin_server_ts).fromNow();
-    }
-
-    public get fullTimestamp(): string {
-        return moment(this.event.origin_server_ts).format(); // TODO: Actually format the timestamp
     }
 
     public get previousTargetContent(): RoomMemberEventContent {

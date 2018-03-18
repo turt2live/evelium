@@ -26,7 +26,6 @@ import { EventTileComponentBase } from "../event-tile.component.base";
 import { TextBody_MessageEventTileComponent } from "./text/text.component";
 import { NoticeBody_MessageEventTileComponent } from "./notice/notice.component";
 import { EmoteBody_MessageEventTileComponent } from "./emote/emote.component";
-import moment = require("moment");
 import { ImageBody_MessageEventTileComponent } from "./image/image.component";
 
 const MAX_MESSAGE_TIME_BREAK = 2 * 60 * 1000; // 2 minutes
@@ -90,14 +89,6 @@ export class MessageEventTileComponent extends EventTileComponentBase implements
 
     public get senderDisplayName(): string {
         return User.getDisambiguatedName(this.event.sender, this.getRoomMembers());
-    }
-
-    public get timestamp(): string {
-        return moment(this.event.origin_server_ts).fromNow();
-    }
-
-    public get fullTimestamp(): string {
-        return moment(this.event.origin_server_ts).format(); // TODO: Actually format the timestamp
     }
 
     private get bodyMap(): BodyMap {
