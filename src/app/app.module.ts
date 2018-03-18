@@ -47,7 +47,7 @@ import { RoomMessageComposerComponent } from "./views/room/composer/composer.com
 import { MessageEventTileComponent } from "./elements/event-tiles/message/message.component";
 import { RoomMemberAvatarComponent } from "./elements/avatar/room-member/room-member.component";
 import { EventTileComponent } from "./elements/event-tiles/event-tile.component";
-import { MemberEventTileComponent } from "./elements/event-tiles/member/member.component";
+import { MemberEventTileComponent } from "./elements/event-tiles/state/member/member.component";
 import { AppErrorHandler } from "./app.error-handler";
 import { RoomInterfaceComponent } from "./views/logged-in/room-interface/room-interface.component";
 import { HomepageComponent } from "./views/logged-in/homepage/homepage.component";
@@ -64,10 +64,11 @@ import { ImageBody_MessageEventTileComponent } from "./elements/event-tiles/mess
 import { FileSizePipe } from "./pipes/file-size.pipe";
 import { MatrixSafeHtmlComponent } from "./elements/matrix-safe-html/safe-html.component";
 import * as Showdown from "showdown";
-import showdown = require("showdown");
 import { ElasticDirective } from "./directives/elastic.directive";
 import { CommandService } from "./services/commands/command.service";
 import { MemberPillComponent } from "./elements/pill/member/member.component";
+import { CreateRoomEventTileComponent } from "./elements/event-tiles/state/create/create.component";
+import showdown = require("showdown");
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 const SHOWDOWN_CONVERTER = new showdown.Converter();
@@ -113,6 +114,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         MatrixSafeHtmlComponent,
         ElasticDirective,
         MemberPillComponent,
+        CreateRoomEventTileComponent,
 
         // Vendor
     ],
@@ -137,6 +139,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         // Event tiles
         MessageEventTileComponent,
         MemberEventTileComponent,
+        CreateRoomEventTileComponent,
 
         // Event tile bodies
         TextBody_MessageEventTileComponent,

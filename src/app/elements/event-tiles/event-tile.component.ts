@@ -21,10 +21,11 @@ import {
     ViewContainerRef
 } from "@angular/core";
 import { MessageEventTileComponent } from "./message/message.component";
-import { MemberEventTileComponent } from "./member/member.component";
+import { MemberEventTileComponent } from "./state/member/member.component";
 import { EventTileComponentBase } from "./event-tile.component.base";
 import { Room } from "../../models/matrix/dto/room";
 import { RoomTimelineEvent } from "../../views/room/room.component";
+import { CreateRoomEventTileComponent } from "./state/create/create.component";
 
 interface TileMap {
     [eventType: string]: Type<EventTileComponentBase>;
@@ -81,6 +82,7 @@ export class EventTileComponent implements OnInit, OnDestroy {
             cachedTileMap = {
                 'm.room.message': MessageEventTileComponent,
                 'm.room.member': MemberEventTileComponent,
+                'm.room.create': CreateRoomEventTileComponent,
             };
         }
 

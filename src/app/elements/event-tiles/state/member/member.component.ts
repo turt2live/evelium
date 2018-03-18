@@ -17,13 +17,13 @@
  */
 
 import { Component } from "@angular/core";
-import { RoomMemberEvent, RoomMemberEventContent } from "../../../models/matrix/events/room/state/m.room.member";
-import { EventTileComponentBase } from "../event-tile.component.base";
+import { RoomMemberEvent, RoomMemberEventContent } from "../../../../models/matrix/events/room/state/m.room.member";
+import { EventTileComponentBase } from "../../event-tile.component.base";
 
 @Component({
     selector: "my-member-event-tile",
     templateUrl: "./member.component.html",
-    styleUrls: ["./member.component.scss"]
+    styleUrls: ["../state.component.scss"]
 })
 export class MemberEventTileComponent extends EventTileComponentBase {
 
