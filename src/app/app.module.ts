@@ -69,6 +69,7 @@ import { CommandService } from "./services/commands/command.service";
 import { MemberPillComponent } from "./elements/pill/member/member.component";
 import { CreateRoomEventTileComponent } from "./elements/event-tiles/state/create/create.component";
 import showdown = require("showdown");
+import { RoomNameEventTileComponent } from "./elements/event-tiles/state/name/name.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 const SHOWDOWN_CONVERTER = new showdown.Converter();
@@ -115,6 +116,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         ElasticDirective,
         MemberPillComponent,
         CreateRoomEventTileComponent,
+        RoomNameEventTileComponent,
 
         // Vendor
     ],
@@ -140,6 +142,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         MessageEventTileComponent,
         MemberEventTileComponent,
         CreateRoomEventTileComponent,
+        RoomNameEventTileComponent,
 
         // Event tile bodies
         TextBody_MessageEventTileComponent,
