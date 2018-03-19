@@ -67,7 +67,11 @@ export class ImageBody_MessageEventTileComponent extends EventTileComponentBase 
 
     public get thumbnailUrl(): string {
         if (!this.hasUrl) return null;
-        return this.media.mxcToThumbnailUrl(this.mxcUrl, this.width, this.height, "scale");
+
+        const thumbnail = this.rawThumbnailInfo;
+        if (thumbnail.isThumbnail && thumbnail.width === this.width && thumbnail.height === this.height) {
+            return this.media.mxcToHttp(thumbnail.mxc);
+        } else return this.media.mxcToThumbnailUrl(thumbnail.mxc, this.width, this.height, "scale");
     }
 
     public get downloadUrl(): string {
@@ -75,15 +79,35 @@ export class ImageBody_MessageEventTileComponent extends EventTileComponentBase 
         return this.media.mxcToHttp(this.mxcUrl);
     }
 
+    public get rawThumbnailInfo(): { mxc: string, width: number, height: number, isThumbnail } {
+        if (!this.imageEvent || !this.imageEvent.content) return null;
+
+        let mxc = this.mxcUrl;
+        let isThumbnail = false;
+        if (this.imageEvent.content.info && this.imageEvent.content.info.thumbnail_url) {
+            mxc = this.imageEvent.content.info.thumbnail_url;
+            isThumbnail = true;
+        }
+
+        let width = this.imageEvent.content.info.w;
+        let height = this.imageEvent.content.info.h;
+        if (this.imageEvent.content.info.thumbnail_info) {
+            width = this.imageEvent.content.info.thumbnail_info.w;
+            height = this.imageEvent.content.info.thumbnail_info.h;
+        }
+
+        return {mxc, width, height, isThumbnail};
+    }
+
     public get dimensions(): { width: number, height: number } {
         if (!this.imageEvent || !this.imageEvent.content || !this.imageEvent.content.info) {
             return {width: MAX_WIDTH, height: MAX_HEIGHT};
         }
 
-        const width = Math.max(this.imageEvent.content.info.w || MAX_WIDTH, MIN_WIDTH);
-        const height = Math.max(this.imageEvent.content.info.h || MAX_HEIGHT, MIN_HEIGHT);
+        const width = Math.max(this.rawThumbnailInfo.width || MAX_WIDTH, MIN_WIDTH);
+        const height = Math.max(this.rawThumbnailInfo.height || MAX_HEIGHT, MIN_HEIGHT);
 
-        if (width <= MAX_WIDTH && height <= MAX_HEIGHT)return { width, height };
+        if (width <= MAX_WIDTH && height <= MAX_HEIGHT) return {width, height};
 
         const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
 
