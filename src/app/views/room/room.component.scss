@@ -42,6 +42,10 @@
     .events {
       min-height: 100%;
 
+      .event:hover {
+        background-color: $event_tile_hover_bg_color;
+      }
+
       .event {
         display: block;
 
