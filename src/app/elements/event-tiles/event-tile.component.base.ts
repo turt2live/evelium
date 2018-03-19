@@ -21,6 +21,7 @@ import { Room } from "../../models/matrix/dto/room";
 import { RoomTimelineEvent } from "../../views/room/room.component";
 import { RoomEvent } from "../../models/matrix/events/room/room-event";
 import { RoomMemberEvent } from "../../models/matrix/events/room/state/m.room.member";
+import { MOMENT_FULL_TIMESTAMP_FORMAT } from "../../app.module";
 import moment = require("moment");
 
 export abstract class EventTileComponentBase {
@@ -48,6 +49,6 @@ export abstract class EventTileComponentBase {
     }
 
     public get fullTimestamp(): string {
-        return moment(this.event.origin_server_ts).format(); // TODO: Actually format the timestamp
+        return moment(this.event.origin_server_ts).format(MOMENT_FULL_TIMESTAMP_FORMAT);
     }
 }
