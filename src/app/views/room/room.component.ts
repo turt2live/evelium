@@ -25,6 +25,7 @@ import { PerfectScrollbarDirective } from "ngx-perfect-scrollbar";
 import { ReadReceipts, Room, UserReadReceipt } from "../../models/matrix/dto/room";
 import { RoomEvent } from "../../models/matrix/events/room/room-event";
 import { EventTileComponent } from "../../elements/event-tiles/event-tile.component";
+import { RoomService } from "../../services/matrix/room.service";
 
 export interface RoomTimelineEvent {
     event: RoomEvent;
@@ -52,7 +53,7 @@ export class RoomComponent implements OnInit, OnDestroy, OnChanges, AfterViewIni
     private eventTilesSubscription: Subscription;
     private readReceiptsSubscription: Subscription;
 
-    constructor() {
+    constructor(private rooms: RoomService) {
     }
 
     public ngOnInit() {
@@ -95,6 +96,8 @@ export class RoomComponent implements OnInit, OnDestroy, OnChanges, AfterViewIni
             event: event,
             previous: this.timeline.length > 0 ? this.timeline[this.timeline.length - 1] : null,
         });
+
+        this.rooms.sendReadReceipt(this.room);
     }
 
     private onReadReceipts(newReceipts: ReadReceipts): void {

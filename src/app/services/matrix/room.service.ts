@@ -38,6 +38,7 @@ import { AccountDataEvent } from "../../models/matrix/events/account/account-dat
 import { DirectChatsEventContent } from "../../models/matrix/events/account/m.direct";
 import { EventTileService } from "../event-tile.service";
 import { ReceiptEvent } from "../../models/matrix/events/ephemeral/m.receipt";
+import { SendReceiptResponse } from "../../models/matrix/http/receipts";
 
 const MAX_MEMORY_TIMELINE_SIZE = 150; // TODO: Configuration?
 
@@ -93,6 +94,11 @@ export class RoomService extends AuthenticatedApi {
         this.checkHandler();
         return roomHandler.getRoomById(roomId);
     }
+
+    public sendReadReceipt(room: Room): Promise<any> {
+        this.checkHandler();
+        return roomHandler.sendReadReceipt(room);
+    }
 }
 
 interface ReadReceiptMap {
@@ -144,7 +150,7 @@ class RoomHandler {
     private db: AngularIndexedDB;
     private dbPromise: Promise<any>;
 
-    constructor(http: HttpClient, auth: AuthService, sync: SyncService, account: AccountService,
+    constructor(http: HttpClient, private auth: AuthService, sync: SyncService, account: AccountService,
                 private hs: HomeserverService, private tiles: EventTileService) {
         this.api = new AuthenticatedApiAccess(http, auth);
 
@@ -411,6 +417,26 @@ class RoomHandler {
             cachedRoom.pendingTimelineOut.next(cachedRoom.lastPending);
 
             event.event_id = r.event_id; // It should automatically end up on the timeline
+        });
+    }
+
+    public sendReadReceipt(room: Room): Promise<any> {
+        const cachedRoom = this.cache[room.roomId];
+        const lastReadReceipt = cachedRoom.lastReadReceipts[this.auth.userId];
+        const lastEvent = cachedRoom.timelineEvents[cachedRoom.timelineEvents.length - 1];
+        if (lastReadReceipt.eventId === lastEvent.event.event_id) return Promise.resolve();
+
+        cachedRoom.lastReadReceipts[this.auth.userId] = {
+            eventId: lastEvent.event.event_id,
+            timestamp: new Date().getTime()
+        };
+        this.calculateNewReadReceipts(cachedRoom);
+
+        const url = `${this.hs.clientServerApi}/rooms/${room.roomId}/receipt/m.read/${lastEvent.event.event_id}`;
+        return this.api.post<SendReceiptResponse>(url, {}).toPromise().catch(err => {
+            console.error(err);
+            cachedRoom.lastReadReceipts[this.auth.userId] = lastReadReceipt;
+            this.calculateNewReadReceipts(cachedRoom);
         });
     }
 
