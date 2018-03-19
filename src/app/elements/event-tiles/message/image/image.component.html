@@ -18,8 +18,8 @@
 
 <div class="container">
     <div class="img-container" [ngStyle]="style">
-        <div class="filename" *ngIf="!isLoading && !isError">{{ event.content.body || "image" }}</div>
-        <a [href]="downloadUrl" class="download-button" *ngIf="!isLoading && !isError" download="" target="_blank">
+        <div class="filename overlay" *ngIf="!isLoading && !isError">{{ event.content.body || "image" }}</div>
+        <a [href]="downloadUrl" class="download-button overlay" *ngIf="!isLoading && !isError" download="" target="_blank">
             <i class="fa fa-download"></i>
         </a>
 
@@ -41,7 +41,7 @@
             <div class="message">There was an error showing this image</div>
         </div>
 
-        <div class="size" *ngIf="!isLoading && !isError && imageEvent.content.info && imageEvent.content.info.size > 0">
+        <div class="size overlay" *ngIf="!isLoading && !isError && imageEvent.content.info && imageEvent.content.info.size > 0">
             {{ imageEvent.content.info.size | myFileSize:2 }}
         </div>
     </div>

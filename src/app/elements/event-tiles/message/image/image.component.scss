@@ -21,9 +21,20 @@
   display: block;
   position: relative;
 
+  .img-container:hover {
+    .overlay {
+      opacity: 1;
+    }
+  }
+
   .img-container {
     display: block;
     position: relative;
+
+    .overlay {
+      opacity: 0.3;
+      transition: opacity 0.2s ease-in-out;
+    }
 
     .filename {
       position: absolute;
