@@ -31,9 +31,19 @@ import { SimpleRoomMessageEvent } from "../events/room/m.room.message";
 import * as Showdown from "showdown";
 import { LocatorService } from "../../../services/locator.service";
 
+export interface ReadReceipts {
+    [eventId: string]: UserReadReceipt[];
+}
+
+export interface UserReadReceipt {
+    userId: string;
+    timestamp: number;
+}
+
 export class Room {
     public timeline: Subject<RoomEvent>;
     public pendingTimeline: Observable<RoomEvent[]>;
+    public readReceipts: Observable<ReadReceipts>;
 
     public isDirect: boolean;
 
@@ -98,6 +108,24 @@ export class Room {
         if (sortedJoinedMembers.length > 2) {
             return `${User.getDisambiguatedName(sortedJoinedMembers[0].state_key, allMembers)} and ${joinedMembers.length - 1} other${joinedMembers.length - 1 !== 1 ? 's' : ''}`;
         }
+    }
+
+    /**
+     * Get all the known m.room.member events for this room
+     * @returns {RoomMemberEvent[]} The room member events for this room
+     */
+    public get memberEvents(): RoomMemberEvent[] {
+        return this.state.filter(e => e.type === "m.room.member").map(e => <RoomMemberEvent>e);
+    }
+
+    /**
+     * Attempts to locate the room member event for the given user ID. If none is found, null
+     * is returned.
+     * @param {string} userId The user ID to find a room member event for
+     * @returns {RoomMemberEvent} The room member event found, or null
+     */
+    public getMemberEvent(userId: string): RoomMemberEvent {
+        return this.memberEvents.find(e => e.type === "m.room.member" && e.state_key === userId);
     }
 
     /**

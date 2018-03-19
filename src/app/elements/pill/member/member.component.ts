@@ -41,7 +41,7 @@ export class MemberPillComponent {
     }
 
     public get memberEvent(): RoomMemberEvent {
-        return this.getRoomMembers().find(e => e.state_key === this.userId);
+        return this.room.getMemberEvent(this.userId);
     }
 
     public get displayName(): string {

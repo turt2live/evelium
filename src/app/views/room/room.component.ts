@@ -22,7 +22,7 @@ import {
 } from "@angular/core";
 import { Subscription } from "rxjs/Subscription";
 import { PerfectScrollbarDirective } from "ngx-perfect-scrollbar";
-import { Room } from "../../models/matrix/dto/room";
+import { ReadReceipts, Room, UserReadReceipt } from "../../models/matrix/dto/room";
 import { RoomEvent } from "../../models/matrix/events/room/room-event";
 import { EventTileComponent } from "../../elements/event-tiles/event-tile.component";
 
@@ -46,24 +46,35 @@ export class RoomComponent implements OnInit, OnDestroy, OnChanges, AfterViewIni
     public timeline: RoomTimelineEvent[] = [];
 
     private onBottom = true;
+    private readReceipts: ReadReceipts = {};
 
     private roomSubscription: Subscription;
     private eventTilesSubscription: Subscription;
+    private readReceiptsSubscription: Subscription;
 
     constructor() {
     }
 
     public ngOnInit() {
-        if (this.room) this.roomSubscription = this.room.timeline.subscribe(this.onTimelineEvent.bind(this));
+        if (this.room) {
+            this.roomSubscription = this.room.timeline.subscribe(this.onTimelineEvent.bind(this));
+            this.readReceiptsSubscription = this.room.readReceipts.subscribe(this.onReadReceipts.bind(this));
+        }
     }
 
     public ngOnChanges() {
         this.timeline = [];
+        this.readReceipts = {};
+
         if (this.roomSubscription) this.roomSubscription.unsubscribe();
+        if (this.readReceiptsSubscription) this.readReceiptsSubscription.unsubscribe();
 
         // HACK: We shouldn't have to do this - why can the event tile subscription not handle this case?
         setTimeout(() => {
-            if (this.room) this.roomSubscription = this.room.timeline.subscribe(this.onTimelineEvent.bind(this));
+            if (this.room) {
+                this.roomSubscription = this.room.timeline.subscribe(this.onTimelineEvent.bind(this));
+                this.readReceiptsSubscription = this.room.readReceipts.subscribe(this.onReadReceipts.bind(this));
+            }
         }, 1);
     }
 
@@ -84,6 +95,15 @@ export class RoomComponent implements OnInit, OnDestroy, OnChanges, AfterViewIni
             event: event,
             previous: this.timeline.length > 0 ? this.timeline[this.timeline.length - 1] : null,
         });
+    }
+
+    private onReadReceipts(newReceipts: ReadReceipts): void {
+        this.readReceipts = newReceipts;
+    }
+
+    public getReadReceipts(event: RoomTimelineEvent): UserReadReceipt[] {
+        if (!this.readReceipts) return [];
+        return this.readReceipts[event.event.event_id];
     }
 
     public onComposerResize() {

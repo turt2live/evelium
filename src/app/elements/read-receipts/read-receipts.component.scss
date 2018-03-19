@@ -15,51 +15,19 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 @import "../../../style/vars";
 
-.loading {
-  display: flex;
+:host {
+  text-align: right;
 }
 
-.room {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: $room_timeline_bg_color;
+.overflow {
+  font-size: 0.7em;
+  color: $read_receipt_overflow_fg_color;
+}
 
-  .header {
-    flex: 0;
-  }
-
-  .timeline {
-    flex: 1 1 auto;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    font-family: "Open Sans", sans-serif;
-
-    .events {
-      min-height: 100%;
-
-      .event {
-        display: block;
-
-        .event-tile {
-          display: inline-block;
-          width: calc(100% - 110px);
-        }
-
-        .read-receipts {
-          display: inline-block;
-          width: 100px;
-          height: 20px;
-        }
-      }
-    }
-  }
-
-  .composer {
-    flex: 0;
-  }
+.read-receipt {
+  display: inline-block;
+  margin-left: 2px;
 }

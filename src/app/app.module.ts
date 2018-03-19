@@ -73,6 +73,9 @@ import { RoomNameEventTileComponent } from "./elements/event-tiles/state/name/na
 import { RoomTopicEventTileComponent } from "./elements/event-tiles/state/topic/topic.component";
 import { EventTileService } from "./services/event-tile.service";
 import { NotificationsService } from "./services/matrix/notifications.service";
+import { ReadReceiptsComponent } from "./elements/read-receipts/read-receipts.component";
+
+export const MOMENT_FULL_TIMESTAMP_FORMAT = "dddd, MMMM Do YYYY, h:mm:ss a";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {};
 const SHOWDOWN_CONVERTER = new showdown.Converter();
@@ -121,6 +124,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         CreateRoomEventTileComponent,
         RoomNameEventTileComponent,
         RoomTopicEventTileComponent,
+        ReadReceiptsComponent,
 
         // Vendor
     ],

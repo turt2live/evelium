@@ -40,8 +40,7 @@ export abstract class EventTileComponentBase {
     }
 
     public get sender(): RoomMemberEvent {
-        return this.room.state.filter(e => e.type === "m.room.member").map(e => <RoomMemberEvent>e)
-            .find(e => e.state_key === this.event.sender);
+        return this.room.getMemberEvent(this.event.sender);
     }
 
     public get timestamp(): string {

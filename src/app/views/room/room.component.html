@@ -27,11 +27,17 @@
          (psYReachEnd)="onEndReached($event)"
     >
         <div class="events">
-            <my-event-tile #eventTiles class="event-tile"
-                           *ngFor="let event of timeline"
-                           [timelineEvent]="event"
-                           [room]="room"
-            ></my-event-tile>
+            <div class="event" *ngFor="let event of timeline">
+                <my-event-tile #eventTiles class="event-tile"
+                               [timelineEvent]="event"
+                               [room]="room"
+                ></my-event-tile>
+                <my-event-read-receipts class="read-receipts"
+                                        [room]="room"
+                                        [readReceipts]="getReadReceipts(event)"
+                                        [maxIcons]="4"
+                ></my-event-read-receipts>
+            </div>
         </div>
     </div>
     <my-room-message-composer [room]="room"

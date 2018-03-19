@@ -20,7 +20,7 @@ import { AuthenticatedApi, AuthenticatedApiAccess } from "./authenticated-api";
 import { HttpClient } from "@angular/common/http";
 import { AuthService } from "./auth.service";
 import { SyncService } from "./sync.service";
-import { Room } from "../../models/matrix/dto/room";
+import { ReadReceipts, Room } from "../../models/matrix/dto/room";
 import { RoomEvent } from "../../models/matrix/events/room/room-event";
 import { Subject } from "rxjs/Subject";
 import { Observable } from "rxjs/Observable";
@@ -29,7 +29,6 @@ import { ReplaySubject } from "rxjs/ReplaySubject";
 import { AngularIndexedDB } from "angular2-indexeddb/angular2-indexeddb";
 import { RoomStateEvent } from "../../models/matrix/events/room/state/room-state-event";
 import { ROOMS_DB } from "./databases";
-import { EphemeralEvent } from "../../models/matrix/events/ephemeral/ephemeral-event";
 import { RoomAccountDataEvent } from "../../models/matrix/events/account/room_account/room-account-data-event";
 import { HomeserverService } from "./homeserver.service";
 import { SendEventResponse } from "../../models/matrix/http/events";
@@ -38,6 +37,7 @@ import { AccountService } from "./account.service";
 import { AccountDataEvent } from "../../models/matrix/events/account/account-data-event";
 import { DirectChatsEventContent } from "../../models/matrix/events/account/m.direct";
 import { EventTileService } from "../event-tile.service";
+import { ReceiptEvent } from "../../models/matrix/events/ephemeral/m.receipt";
 
 const MAX_MEMORY_TIMELINE_SIZE = 150; // TODO: Configuration?
 
@@ -95,11 +95,21 @@ export class RoomService extends AuthenticatedApi {
     }
 }
 
+interface ReadReceiptMap {
+    [userId: string]: {
+        eventId: string;
+        timestamp: number;
+    };
+}
+
 interface CachedRoom {
     obj: Room;
+    timelineEvents: { event: RoomEvent, renderable: boolean }[];
     timelineOut: Subject<RoomEvent>;
     pendingTimelineOut: Subject<RoomEvent[]>; // sends full timeline on each update
+    readReceiptsOut: Subject<ReadReceipts>; // replay
     lastPending: RoomEvent[];
+    lastReadReceipts: ReadReceiptMap;
 }
 
 class RoomHandler {
@@ -174,7 +184,7 @@ class RoomHandler {
     private async processLeftRooms(response: SyncResponse): Promise<any> {
         console.log("Processing left rooms from sync response");
 
-        let updateJoinedRooms = false;
+        let updateJoinedRooms: boolean;
         for (const roomId in response.rooms.leave) {
             const cachedRoom = this.cache[roomId];
             if (!cachedRoom) continue; // Only need to delete if we're actually leaving
@@ -203,10 +213,16 @@ class RoomHandler {
             }
 
             await this.upsertRoom(cachedRoom.obj);
+            const updatedReadReceipts: ReadReceiptMap = {};
 
-            if (syncRoom.timeline && syncRoom.timeline.events) {
-                await this.addEventsToRoom(cachedRoom.obj, syncRoom.timeline.events);
+            if (syncRoom.timeline && syncRoom.timeline.events && syncRoom.timeline.events.length > 0) {
+                const readReceipts = await this.addEventsToRoom(cachedRoom.obj, syncRoom.timeline.events);
                 await this.storeBatch(cachedRoom.obj, syncRoom.timeline.events, syncRoom.timeline.prev_batch);
+
+                // Copy read receipts into our sync copy for handling
+                for (const userId in readReceipts) {
+                    updatedReadReceipts[userId] = readReceipts[userId];
+                }
             }
 
             if (syncRoom.account_data && syncRoom.account_data.events) {
@@ -214,11 +230,83 @@ class RoomHandler {
             }
 
             if (syncRoom.ephemeral && syncRoom.ephemeral.events) {
-                syncRoom.ephemeral.events.forEach(e => this.upsertEdu(cachedRoom.obj, e));
+                syncRoom.ephemeral.events.forEach(event => {
+                    if (event.type !== "m.receipt") {
+                        console.warn("Skipping ephemeral event of type " + event.type + " in " + roomId);
+                        return;
+                    }
+
+                    const receiptEvent = <ReceiptEvent>event;
+                    Object.keys(receiptEvent.content).forEach(eventId => {
+                        const eventReceipts = receiptEvent.content[eventId];
+                        if (!eventReceipts["m.read"]) {
+                            console.warn("m.receipt in " + roomId + " does not have an m.read");
+                            return;
+                        }
+
+                        Object.keys(eventReceipts["m.read"]).forEach(userId => {
+                            const ts = eventReceipts["m.read"][userId]["ts"] || new Date().getTime();
+
+                            let updateMemoryReceipt = true;
+                            const currentReceipt = cachedRoom.lastReadReceipts[userId];
+                            if (currentReceipt) {
+                                const currentEventIndex = cachedRoom.timelineEvents.findIndex(e => e.event.event_id === currentReceipt.eventId);
+                                const targetEventIndex = cachedRoom.timelineEvents.findIndex(e => e.event.event_id === eventId);
+                                if (targetEventIndex < currentEventIndex) {
+                                    // Skip read receipt - we have a newer one already stored
+                                    updateMemoryReceipt = false;
+                                }
+                            }
+
+                            if (updateMemoryReceipt) {
+                                updatedReadReceipts[userId] = {
+                                    eventId: eventId,
+                                    timestamp: ts,
+                                };
+                            }
+
+                            return this.upsertReadReceipt(cachedRoom.obj, eventId, userId, ts);
+                        });
+                    });
+                });
+
+                // Create a new map for read receipts
+                const userIds = Object.keys(updatedReadReceipts);
+                if (userIds.length > 0) {
+                    userIds.forEach(u => cachedRoom.lastReadReceipts[u] = updatedReadReceipts[u]);
+                    this.calculateNewReadReceipts(cachedRoom);
+                }
             }
         }
 
         if (updateJoinedRooms) this.updateJoinedRooms();
+    }
+
+    private calculateNewReadReceipts(cachedRoom: CachedRoom) {
+        const newMap: ReadReceipts = {};
+        for (const userId in cachedRoom.lastReadReceipts) {
+            const rr = cachedRoom.lastReadReceipts[userId];
+
+            let eventIndex = cachedRoom.timelineEvents.findIndex(e => e.event.event_id === rr.eventId);
+            if (eventIndex === -1) {
+                // Try and find the most recent event we can slap a read receipt on
+                for (let i = cachedRoom.timelineEvents.length - 1; i > 0; i--) {
+                    const event = cachedRoom.timelineEvents[i];
+                    if (event.renderable && event.event.origin_server_ts <= rr.timestamp) {
+                        eventIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            while (eventIndex >= 0 && !cachedRoom.timelineEvents[eventIndex].renderable) eventIndex--;
+            if (eventIndex < 0) continue;
+
+            if (!newMap[rr.eventId]) newMap[rr.eventId] = [];
+            newMap[rr.eventId].push({userId: userId, timestamp: rr.timestamp});
+        }
+
+        cachedRoom.readReceiptsOut.next(newMap);
     }
 
     private async processDirectChats(rawEvent: AccountDataEvent): Promise<any> {
@@ -290,11 +378,17 @@ class RoomHandler {
         };
         room.timeline = Subject.create(timelineObserver, timelineObservable);
 
+        const readReceiptsObservable = new ReplaySubject<ReadReceipts>(1);
+        room.readReceipts = readReceiptsObservable;
+
         const cachedRoom: CachedRoom = {
             obj: room,
+            timelineEvents: [],
             timelineOut: timelineObservable,
             pendingTimelineOut: pendingTimeline,
+            readReceiptsOut: readReceiptsObservable,
             lastPending: [],
+            lastReadReceipts: {},
         };
         this.cache[roomId] = cachedRoom;
 
@@ -320,8 +414,9 @@ class RoomHandler {
         });
     }
 
-    private addEventsToRoom(room: Room, events: RoomEvent[]): Promise<any> {
+    private addEventsToRoom(room: Room, events: RoomEvent[]): Promise<ReadReceiptMap> {
         const cachedRoom = this.cache[room.roomId];
+        const updatedReadReceipts: ReadReceiptMap = {};
 
         for (const event of events) {
             // See if we need to update state
@@ -342,11 +437,16 @@ class RoomHandler {
             }
 
             // Now process the event normally (add to timeline), assuming we can render it
+            const renderable = this.tiles.isRenderable(event);
+            cachedRoom.timelineEvents.push({event: event, renderable: renderable});
             if (this.tiles.isRenderable(event)) cachedRoom.timelineOut.next(event);
             else console.warn("Event of type '" + event.type + "' is not renderable");
+
+            // Don't forget to send a read receipt for the event
+            updatedReadReceipts[event.sender] = {eventId: event.event_id, timestamp: event.origin_server_ts};
         }
 
-        return Promise.resolve();
+        return Promise.resolve(updatedReadReceipts);
     }
 
     private async storeBatch(room: Room, events: RoomEvent[], prevBatch: string): Promise<any> {
@@ -390,18 +490,19 @@ class RoomHandler {
         }).then(() => this.db.add("account_data", dbRecord));
     }
 
-    private async upsertEdu(room: Room, event: EphemeralEvent): Promise<any> {
+    private async upsertReadReceipt(room: Room, eventId: string, userId: string, timestamp: number): Promise<any> {
         await this.dbPromise;
 
         const dbRecord = {
             roomId: room.roomId,
-            eventType: event.type,
-            content: event.content,
+            eventId: eventId,
+            userId: userId,
+            timestamp: timestamp,
         };
 
-        return this.db.getByKey("edus", [room.roomId, event.type]).then(record => {
-            if (record) return this.db.delete("edus", [room.roomId, event.type]);
-        }).then(() => this.db.add("edus", dbRecord));
+        return this.db.getByKey("read_receipts", [room.roomId, userId]).then(record => {
+            if (record) return this.db.delete("read_receipts", [room.roomId, userId]);
+        }).then(() => this.db.add("read_receipts", dbRecord));
     }
 
     private async deleteRoom(room: Room): Promise<any> {
@@ -431,35 +532,16 @@ class RoomHandler {
     }
 
     private loadFromDb(): Promise<any> {
-        this.db = new AngularIndexedDB(ROOMS_DB, 1);
-        return this.db.openDatabase(1, evt => {
-            evt.currentTarget.result.createObjectStore("batches", {
-                keyPath: "id",
-                autoIncrement: true,
-            });
-            // batches.createIndex("roomId", "roomId", {unique: false});
-            // batches.createIndex("prevBatch", "prevBatch", {unique: false});
-            // batches.createIndex("events", "events", {unique: false});
-
-            evt.currentTarget.result.createObjectStore("rooms", {
-                keyPath: "roomId",
-            });
-            // roomState.createIndex("roomId", "roomId", {unique: true});
-            // roomState.createIndex("state", "state", {unique: false});
-
-            evt.currentTarget.result.createObjectStore("edus", {
-                keyPath: ["roomId", "eventType"],
-            });
-            // eduStore.createIndex("roomId", "roomId", {unique: false});
-            // eduStore.createIndex("eventType", "eventType", {unique: false});
-            // eduStore.createIndex("content", "content", {unique: false});
-
-            evt.currentTarget.result.createObjectStore("account_data", {
-                keyPath: ["roomId", "eventType"],
-            });
-            // accountData.createIndex("roomId", "roomId", {unique: false});
-            // accountData.createIndex("eventType", "eventType", {unique: false});
-            // accountData.createIndex("content", "content", {unique: false});
+        this.db = new AngularIndexedDB(ROOMS_DB, 2);
+        return this.db.openDatabase(2, evt => {
+            switch (evt.oldVersion) {
+                case 0:
+                    return this.dbFreshInstall(evt);
+                case 1:
+                    return this.dbUpgradeTo2(evt);
+                case 2:
+                    return this.dbUpgradeTo3(evt);
+            }
         }).then(() => {
             return this.db.getAll("rooms");
         }).then(records => {
@@ -475,11 +557,70 @@ class RoomHandler {
                     console.warn("Could not find room " + r.roomId + " but we have batches for it");
                     return;
                 }
-                return this.addEventsToRoom(room.obj, r.events);
+                return this.addEventsToRoom(room.obj, r.events).then(readReceipts => {
+                    for (const userId in readReceipts) {
+                        room.lastReadReceipts[userId] = readReceipts[userId];
+                    }
+                });
             }));
         }).then(() => {
-            // TODO: Load EDUs
+            return this.db.getAll("read_receipts");
+        }).then(records => {
+            // Populate read receipts first
+            for (const record of records) {
+                const room = this.cache[record.roomId];
+                if (!room) {
+                    console.warn("Could not find room " + record.roomId + " but we have read receipts for it");
+                    continue;
+                }
+
+                const currentReceipt = room.lastReadReceipts[record.userId];
+                if (currentReceipt) {
+                    const currentEventIndex = room.timelineEvents.findIndex(e => e.event.event_id === currentReceipt.eventId);
+                    const targetEventIndex = room.timelineEvents.findIndex(e => e.event.event_id === record.eventId);
+                    if (targetEventIndex < currentEventIndex) {
+                        // Skip read receipt - we have a newer one already stored
+                        continue;
+                    }
+                }
+                room.lastReadReceipts[record.userId] = {eventId: record.eventId, timestamp: record.timestamp};
+            }
+
+            // Then calculate the new state
+            for (const roomId in this.cache) {
+                this.calculateNewReadReceipts(this.cache[roomId]);
+            }
+        }).then(() => {
             // TODO: Load Room Account Data
         });
+    }
+
+    private dbFreshInstall(evt: any) {
+        this.dbUpgradeTo1(evt);
+        this.dbUpgradeTo2(evt);
+    }
+
+    private dbUpgradeTo1(evt: any) {
+        evt.currentTarget.result.createObjectStore("batches", {
+            keyPath: "id",
+            autoIncrement: true,
+        });
+        evt.currentTarget.result.createObjectStore("rooms", {
+            keyPath: "roomId",
+        });
+        evt.currentTarget.result.createObjectStore("account_data", {
+            keyPath: ["roomId", "eventType"],
+        });
+    }
+
+    private dbUpgradeTo2(evt: any) {
+        evt.currentTarget.result.createObjectStore("read_receipts", {
+            keyPath: ["roomId", "userId"],
+        });
+        evt.currentTarget.result.deleteObjectStore("edus");
+    }
+
+    private dbUpgradeTo3(_evt: any) {
+        // Nothing to do, yet
     }
 }
