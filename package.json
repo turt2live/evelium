@@ -93,5 +93,8 @@
     "webpack": "^3.11.0",
     "webpack-dev-server": "^2.11.2",
     "zone.js": "^0.8.20"
+  },
+  "dependencies": {
+    "url-parse": "^1.2.0"
   }
 }

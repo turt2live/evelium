@@ -21,6 +21,7 @@ import { ToasterService } from "angular2-toaster";
 import { Router } from "@angular/router";
 import { AuthService } from "../../services/matrix/auth.service";
 import { HomeserverService } from "../../services/matrix/homeserver.service";
+import { WellKnownService } from "../../services/matrix/wellknown.service";
 
 @Component({
     templateUrl: "./login.component.html",
@@ -35,22 +36,30 @@ export class LoginComponent {
     constructor(private router: Router,
                 private toaster: ToasterService,
                 private auth: AuthService,
-                private hs: HomeserverService) {
+                private hs: HomeserverService,
+                private wellknown: WellKnownService) {
         if (auth.isLoggedIn()) {
             console.log("Redirecting to app: Already logged in");
             router.navigate(["/app"]);
         }
     }
 
-    public login(): void {
+    public async login(): Promise<void> {
         if (!this.username || this.username[0] !== "@") {
             this.toaster.pop("error", "Please enter a matrix user ID", "Email addresses will be supported in a later version");
             return;
         }
 
-        // TODO: Use a .well-known lookup or similar to resolve this
         if (!this.hs.apiUrl) {
-            this.hs.apiUrl = "https://" + this.username.substring(this.username.indexOf(":") + 1) + "/_matrix";
+            await this.wellknown.getWellKnownForUser(this.username).then((wellKnown) => {
+                // TODO: Signal to the user that we are using this url somehow.
+                this.hs.apiUrl = wellKnown.homeserver.base_url;
+            }).catch((err) => {
+                console.warn("Couldn't fetch .well-known information because", err);
+                console.warn("Falling back to using userid domain-part as location");
+                this.hs.apiUrl = "https://" + this.username.substring(this.username.indexOf(":") + 1) + "/_matrix";
+            });
+
         }
 
         this.auth.login(this.username, this.password).then(() => {
