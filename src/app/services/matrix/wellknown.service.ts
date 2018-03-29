@@ -1,6 +1,6 @@
 /*
  *     Evelium - A matrix client
- *     Copyright (C)  2018 Travis Ralston
+ *     Copyright (C)  2018 Will Hunt
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -38,12 +38,12 @@ export class WellKnownService {
         return this.getWellKnownForDomain(domainPart);
 
     }
+
     // Taken from https://docs.google.com/document/d/1OdEj06qA7diURofyonIMgTR3fB_pWf12Txye41qd-U4
     public async getWellKnownForDomain(hostname: string): Promise<WellKnownResponse> {
         const uri = `https://${hostname}/.well-known/matrix/client`;
         // We have to construct this object ourselves, because the object doesn't fit nicely into an interface.
         const data = await this.http.get(uri).toPromise();
-        console.log(data);
         const response = new WellKnownResponse();
         if (data["m.homeserver"]) {
             try {

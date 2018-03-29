@@ -37,7 +37,7 @@ export class LoginComponent {
                 private toaster: ToasterService,
                 private auth: AuthService,
                 private hs: HomeserverService,
-                private wellknown: WellKnownService) {
+                private wellKnown: WellKnownService) {
         if (auth.isLoggedIn()) {
             console.log("Redirecting to app: Already logged in");
             router.navigate(["/app"]);
@@ -51,7 +51,7 @@ export class LoginComponent {
         }
 
         if (!this.hs.apiUrl) {
-            await this.wellknown.getWellKnownForUser(this.username).then((wellKnown) => {
+            await this.wellKnown.getWellKnownForUser(this.username).then((wellKnown) => {
                 // TODO: Signal to the user that we are using this url somehow.
                 this.hs.apiUrl = wellKnown.homeserver.base_url;
             }).catch((err) => {
