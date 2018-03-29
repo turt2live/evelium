@@ -74,6 +74,7 @@ import { RoomTopicEventTileComponent } from "./elements/event-tiles/state/topic/
 import { EventTileService } from "./services/event-tile.service";
 import { NotificationsService } from "./services/matrix/notifications.service";
 import { ReadReceiptsComponent } from "./elements/read-receipts/read-receipts.component";
+import { WellKnownService } from "./services/matrix/wellknown.service";
 
 export const MOMENT_FULL_TIMESTAMP_FORMAT = "dddd, MMMM Do YYYY, h:mm:ss a";
 
@@ -143,6 +144,7 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         CommandService,
         EventTileService,
         NotificationsService,
+        WellKnownService
 
         // Vendor
     ],
