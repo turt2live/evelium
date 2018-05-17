@@ -27,6 +27,8 @@ import { ToasterModule } from "angular2-toaster";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { BootstrapModalModule } from "ngx-modialog/plugins/bootstrap";
 import { ModalModule } from "ngx-modialog";
+import { MomentModule } from 'ngx-moment';
+import { TimestampComponent } from "./elements/timestamp/timestamp.component";
 import { LocatorService } from "./services/locator.service";
 import { LandingComponent } from "./views/landing/landing.component";
 import { SpinnerComponent } from "./elements/spinner/spinner.component";
@@ -94,11 +96,13 @@ const SHOWDOWN_CONVERTER = new showdown.Converter();
         ModalModule.forRoot(),
         BootstrapModalModule,
         PerfectScrollbarModule,
+        MomentModule,
     ],
     declarations: [
         AppComponent,
         LandingComponent,
         SpinnerComponent,
+        TimestampComponent,
         LoggedInComponent,
         LoginComponent,
         RoomListComponent,

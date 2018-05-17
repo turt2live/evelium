@@ -20,11 +20,11 @@
     <my-member-pill [userId]="sender.state_key" [room]="room"></my-member-pill>
     <span class="description">changed the room topic to "{{ event.content.topic }}"</span>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 <div class="tile" *ngIf="!event.content.topic">
     <my-member-pill [userId]="sender.state_key" [room]="room"></my-member-pill>
     <span class="description">removed the room's topic</span>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
