@@ -30,7 +30,7 @@
                     [forcedAvatarUrl]="target.content.avatar_url"
     ></my-member-pill>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 
 <!-- DISPLAY NAME ONLY -->
@@ -47,7 +47,7 @@
                     [forcedAvatarUrl]="target.content.avatar_url"
     ></my-member-pill>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 
 <!-- AVATAR ONLY -->
@@ -64,7 +64,7 @@
                     [forcedAvatarUrl]="target.content.avatar_url"
     ></my-member-pill>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 
 <!-- JOINED -->
@@ -72,7 +72,7 @@
     <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
     <span class="description">joined the room</span>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 
 <!-- LEFT -->
@@ -80,7 +80,7 @@
     <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
     <span class="description">left the room</span>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 
 <!-- KICKED -->
@@ -93,7 +93,7 @@
         <span class="reason" *ngIf="target.content.reason"> for "{{ target.content.reason }}"</span>
     </span>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 
 <!-- BANNED -->
@@ -106,7 +106,7 @@
         <span class="reason" *ngIf="target.content.reason"> for "{{ target.content.reason }}"</span>
     </span>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 
 <!-- UNBANNED -->
@@ -115,7 +115,7 @@
     <span class="description">lifted the ban on</span>
     <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 
 <!-- INVITED -->
@@ -125,7 +125,7 @@
     <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
     <span class="description">to the room</span>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 
 <!-- DECLINED INVITE -->
@@ -133,7 +133,7 @@
     <my-member-pill [userId]="sender.state_key" [room]="room"></my-member-pill>
     <span class="description">declined the invite</span>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 
 <!-- UNKNOWN -->
@@ -141,6 +141,6 @@
     <my-member-pill [userId]="target.state_key" [room]="room"></my-member-pill>
     <span class="description">had their membership updated</span>
 
-    <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+    <my-timestamp [timestamp]="timestamp"></my-timestamp>
 </div>
 

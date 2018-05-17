@@ -27,7 +27,7 @@
     <div class="content">
         <div class="sender-info" *ngIf="showSender">
             <span class="name">{{ senderDisplayName }}</span>
-            <span class="timestamp" [title]="fullTimestamp">{{ timestamp }}</span>
+            <my-timestamp [timestamp]="timestamp"></my-timestamp>
         </div>
         <div class="body" #eventBody></div>
     </div>

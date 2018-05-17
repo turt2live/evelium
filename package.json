@@ -95,6 +95,7 @@
     "zone.js": "^0.8.20"
   },
   "dependencies": {
+    "ngx-moment": "^2.0.0",
     "url-parse": "^1.2.0"
   }
 }
